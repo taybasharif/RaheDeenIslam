@@ -1,0 +1,21 @@
+{
+  "name": "rah-e-deen-islam",
+  "version": "1.0.0",
+  "description": "RAH E DEEN ISLAM | راہ دین اسلام — Premium Islamic Website Pakistan with live prayer timings, Hanafi calculation, weather, complete prayer guides and authentic Quran and Sunnah references.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "islamic-website",
+    "pakistan-prayer-times",
+    "rah-e-deen-islam",
+    "quran",
+    "hadith",
+    "salah-guide"
+  ],
+  "author": "Rah e Deen Islam (p9158412@gmail.com)",
+  "license": "MIT"
+}

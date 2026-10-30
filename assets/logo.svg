@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" width="100%" height="100%">
+  <defs>
+    <!-- Luxury Gold Linear Gradient -->
+    <linearGradient id="luxuryGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3C4" />
+      <stop offset="25%" stop-color="#F3C64F" />
+      <stop offset="55%" stop-color="#D4AF37" />
+      <stop offset="85%" stop-color="#9A7016" />
+      <stop offset="100%" stop-color="#6F4D08" />
+    </linearGradient>
+
+    <!-- Emerald Green Radial Gradient -->
+    <radialGradient id="emeraldRadial" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#086B52" />
+      <stop offset="60%" stop-color="#064E3B" />
+      <stop offset="100%" stop-color="#022C22" />
+    </radialGradient>
+
+    <!-- Soft Golden Glow -->
+    <filter id="goldGlowEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Left Islamic Crest: Geometric Star & Golden Crescent -->
+  <g transform="translate(90, 90)">
+    <!-- Outer Glow Circle -->
+    <circle cx="0" cy="0" r="54" fill="none" stroke="url(#luxuryGoldGrad)" stroke-width="1.2" stroke-opacity="0.4" stroke-dasharray="3 4" />
+    
+    <!-- Rotated 8-Point Geometric Islamic Star (Rub-el-Hizb) -->
+    <rect x="-42" y="-42" width="84" height="84" rx="6" fill="url(#emeraldRadial)" stroke="url(#luxuryGoldGrad)" stroke-width="2.5" />
+    <rect x="-42" y="-42" width="84" height="84" rx="6" transform="rotate(45)" fill="none" stroke="url(#luxuryGoldGrad)" stroke-width="2.5" />
+    
+    <!-- Central Dark Emerald Disc -->
+    <circle cx="0" cy="0" r="29" fill="#022C22" stroke="url(#luxuryGoldGrad)" stroke-width="2" />
+    
+    <!-- Elegant Crescent & Star -->
+    <path d="M-6,-18 A18,18 0 1,0 14,14 A21,21 0 1,1 -6,-18 Z" fill="url(#luxuryGoldGrad)" filter="url(#goldGlowEffect)" />
+    <!-- 5-Point Islamic Star in Crescent -->
+    <polygon points="5,-7 7,-2 12,-2 8,2 10,7 5,4 1,7 3,2 -1,-2 4,-2" fill="#FFF3C4" />
+  </g>
+
+  <!-- Brand Typography and Calligraphy Section (RTL Friendly) -->
+  <g transform="translate(200, 48)">
+    <!-- Decorative Islamic Arch Archway Line -->
+    <path d="M 0,0 Q 200,-16 400,0" fill="none" stroke="url(#luxuryGoldGrad)" stroke-width="1.6" stroke-dasharray="2 3" />
+    <circle cx="200" cy="-8" r="3.5" fill="url(#luxuryGoldGrad)" />
+
+    <!-- 1. Main Urdu Brand Name: راہ دین اسلام -->
+    <text x="400" y="44" text-anchor="end" font-family="'Noto Nastaliq Urdu', 'Amiri', 'Traditional Arabic', serif" font-size="44" font-weight="bold" fill="url(#luxuryGoldGrad)" filter="url(#goldGlowEffect)">
+      راہ دین اسلام
+    </text>
+
+    <!-- 2. English Brand Name: Rah e Deen Islam -->
+    <text x="400" y="75" text-anchor="end" font-family="'Plus Jakarta Sans', 'Segoe UI', sans-serif" font-size="14.5" font-weight="700" letter-spacing="3.5" fill="#FFFFFF">
+      RAH E DEEN ISLAM
+    </text>
+
+    <!-- 3. Official Tagline: قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش -->
+    <text x="400" y="98" text-anchor="end" font-family="'Noto Nastaliq Urdu', 'Jameel Noori Nastaliq', 'Amiri', serif" font-size="12.5" fill="#F3C64F">
+      قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش
+    </text>
+  </g>
+</svg>

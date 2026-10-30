@@ -1,0 +1,23 @@
+[
+  {
+    "email": "p9158412@gmail.com",
+    "subscribedAt": "2026-10-30T10:00:00.000Z",
+    "ip": "127.0.0.1",
+    "role": "admin"
+  },
+  {
+    "email": "test_1793385401204@example.com",
+    "subscribedAt": "2026-10-30T18:36:41.205Z",
+    "ip": "127.0.0.1"
+  },
+  {
+    "email": "testuser_local@gmail.com",
+    "subscribedAt": "2026-10-30T18:39:18.962Z",
+    "ip": "127.0.0.1"
+  },
+  {
+    "email": "brother_ahmed@example.com",
+    "subscribedAt": "2026-10-30T18:39:28.874Z",
+    "ip": "127.0.0.1"
+  }
+]

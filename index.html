@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>راہ دین اسلام | Rah e Deen Islam — مستند اسلامی ویب سائٹ پاکستان</title>
+  <meta name="description" content="راہ دین اسلام: قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش۔ پاکستان کے تمام شہروں کے درست اوقاتِ نماز، مکمل نماز گائیڈ، احادیث مبارکہ، اور اسلامی تعلیمات۔">
+  
+  <!-- Open Graph / Meta -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="راہ دین اسلام | Rah e Deen Islam">
+  <meta property="og:description" content="قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش — پاکستان کے لائیو اوقاتِ نماز اور مستند دینی رہنمائی">
+  <meta property="og:image" content="assets/logo.svg">
+  
+  <!-- Favicon / Brand Icon -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  
+  <!-- Google Fonts: Amiri (Arabic with diacritics), Noto Nastaliq Urdu, Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/patterns.css">
+</head>
+<body class="bg-islamic-lattice">
+
+  <!-- Accessible Skip Link -->
+  <a href="#main-content" class="skip-link">براہِ راست مواد پر جائیں</a>
+
+  <!-- Top Notification & Utility Bar -->
+  <div class="top-bar">
+    <div class="top-bar-info">
+      <span class="top-bar-item">
+        <span class="icon">📅</span>
+        <span id="top-bar-gregorian">--/--/----</span>
+      </span>
+      <span class="top-bar-item">
+        <span class="icon">🌙</span>
+        <span id="top-bar-hijri">ہجری تاریخ لوڈ ہو رہی ہے...</span>
+      </span>
+      <span class="top-bar-item" style="color:var(--gold-400);">
+        <span class="icon">🇵🇰</span>
+        <span>پاکستان اسٹینڈرڈ ٹائم (PKT, UTC+5)</span>
+      </span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" style="color:var(--gold-300); text-decoration:none; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px;">
+        <span style="color:#ef4444;">▶</span> یوٹیوب چینل
+      </a>
+      <a href="mailto:p9158412@gmail.com" style="color:#ffffff; text-decoration:none; font-size:0.9rem; font-family:var(--font-ui);">
+        ✉️ p9158412@gmail.com
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Sticky Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#home" class="brand-wrapper" data-route="home">
+        <img src="assets/logo.svg" alt="راہ دین اسلام لوگو" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>راہ دین اسلام</h1>
+          <p>RAH E DEEN ISLAM</p>
+        </div>
+      </a>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button type="button" class="nav-toggle-btn" id="nav-toggle-btn" aria-label="مینو کھولیں">
+        ☰
+      </button>
+
+      <!-- Main Navigation Menu (12 Core Pages) -->
+      <nav class="main-navigation" id="main-nav" aria-label="مرکزی نیویگیشن">
+        <ul class="nav-list">
+          <li><a href="#home" class="nav-link active" data-route="home">ہوم</a></li>
+          <li><a href="#prayer-times" class="nav-link" data-route="prayer-times">نماز کے اوقات</a></li>
+          <li><a href="#prayer-guide" class="nav-link" data-route="prayer-guide">مکمل نماز گائیڈ</a></li>
+          <li><a href="#prayer-virtues" class="nav-link" data-route="prayer-virtues">نماز کی فضیلت</a></li>
+          <li><a href="#ishraq-chasht" class="nav-link" data-route="ishraq-chasht">اشراق و چاشت</a></li>
+          <li><a href="#awwabin-tahajjud" class="nav-link" data-route="awwabin-tahajjud">اوابین و تہجد</a></li>
+          <li><a href="#hadith" class="nav-link" data-route="hadith">احادیث مبارکہ</a></li>
+          <li><a href="#quran" class="nav-link" data-route="quran">قرآنی آیات</a></li>
+          <li><a href="#wazaif" class="nav-link" data-route="wazaif">اسلامی وظائف</a></li>
+          <li><a href="#categories" class="nav-link" data-route="categories">اسلامی اپڈیٹس</a></li>
+          <li><a href="#about" class="nav-link" data-route="about">ہمارے بارے میں</a></li>
+          <li><a href="#contact" class="nav-link" data-route="contact">رابطہ کریں</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Live Quick Prayer Status Bar -->
+  <section class="prayer-quick-bar" aria-label="فوری اوقاتِ نماز">
+    <div class="prayer-bar-container">
+      <div class="prayer-city-select-wrap">
+        <label for="quick-city-select" style="font-weight:700; color:var(--emerald-900); font-size:0.95rem;">شہر منتخب کریں:</label>
+        <select id="quick-city-select" class="city-select">
+          <!-- Populated dynamically with all 29 Pakistani cities -->
+        </select>
+      </div>
+
+      <!-- Quick Prayer Pills -->
+      <div class="prayer-times-pills" id="quick-prayer-pills">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Multi-Page App Container -->
+  <main class="site-main" id="main-content">
+
+    <!-- ================= VIEW 1: HOME ================= -->
+    <section id="view-home" class="page-view active">
+      <!-- Hero Banner -->
+      <div class="hero-banner">
+        <div class="hero-content">
+          <div class="bismillah-calligraphy">بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيمِ</div>
+          <h2 class="hero-title">راہ دین اسلام</h2>
+          <p class="hero-subtitle">
+            قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش
+          </p>
+
+          <div class="hero-btn-group">
+            <a href="#prayer-times" class="btn btn-gold" data-route="prayer-times">
+              🕌 لائیو اوقاتِ نماز دیکھیں
+            </a>
+            <a href="#prayer-guide" class="btn btn-outline-gold" data-route="prayer-guide">
+              📖 مکمل نماز گائیڈ و رکعات
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Highlights & Quick Countdown Container -->
+      <div id="home-live-countdown-container"></div>
+
+      <!-- YouTube Official Channel Subscription Section -->
+      <div class="youtube-subscribe-section">
+        <div style="font-size:2.6rem; color:#ef4444; margin-bottom:8px;">▶️</div>
+        <h3 style="font-size:1.85rem; font-weight:700; margin-bottom:12px; color:#ffffff;">
+          ہمارے یوٹیوب چینل کو سبسکرائب کریں
+        </h3>
+        <p class="urdu-text" style="font-size:1.15rem; max-width:700px; margin:0 auto; color:#fee2e2;">
+          اسلامی ویڈیوز، خوبصورت احادیث، قرآن کریم، اسلامی وظائف اور روزانہ کی دینی رہنمائی حاصل کرنے کے لیے ہمارے یوٹیوب چینل سے جڑیں۔
+        </p>
+        <div style="margin-top:8px;">
+          <span style="font-weight:700; color:#fca5a5; font-size:1.05rem;">چینل: Rah e Deen Islam</span>
+        </div>
+        <div>
+          <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" class="youtube-subscribe-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            یوٹیوب پر سبسکرائب کریں (Subscribe Now)
+          </a>
+        </div>
+      </div>
+
+      <!-- Hadith of the Day Card -->
+      <div class="card card-crest" style="margin-bottom:32px;">
+        <div class="section-badge" style="margin-bottom:12px;">حدیثِ مبارک برائے امروز</div>
+        <div class="quran-ayah-display">
+          إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى
+        </div>
+        <p class="urdu-text" style="font-size:1.15rem; color:var(--text-dark); margin-bottom:12px;">
+          <strong>ترجمہ:</strong> اعمال کا دارومدار صرف نیتوں پر ہے اور ہر انسان کے لیے وہی ہے جس کی اس نے نیت کی۔
+        </p>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.4); padding-top:12px;">
+          <span style="color:var(--emerald-800); font-weight:700;">صحیح البخاری: 1</span>
+          <a href="https://sunnah.com/bukhari:1" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-gold">
+            سنۃ ڈاٹ کام پر تصدیق کریں 🔗
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Exploration Grid (10 Core Modules) -->
+      <div class="section-header">
+        <span class="section-badge">شعبہ جات و رہنمائی</span>
+        <h3 class="section-title">راہ دین اسلام کے اہم تعلیمی شعبے</h3>
+      </div>
+
+      <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+        <a href="#prayer-times" class="card card-crest" data-route="prayer-times" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">🕌</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">نماز کے لائیو اوقات</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            پاکستان کے تمام شہروں کے درست ترین اوقات، کاؤنٹ ڈاؤن ٹائمر اور طلوع و غروب۔
+          </p>
+        </a>
+
+        <a href="#prayer-guide" class="card card-crest" data-route="prayer-guide" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">📖</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">مکمل نماز گائیڈ</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            پانچوں نمازوں کی رکعات (حنفی ترتیب)، فرض، سنت، واجب اور تصویری طریقہ۔
+          </p>
+        </a>
+
+        <a href="#prayer-virtues" class="card card-crest" data-route="prayer-virtues" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">✨</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">نماز کی فضیلت</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            بروقت نماز اور باجماعت ادائیگی کی قرآنی و نبوی فضائل اور برکات۔
+          </p>
+        </a>
+
+        <a href="#ishraq-chasht" class="card card-crest" data-route="ishraq-chasht" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">☀️</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">اشراق و چاشت</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            مکروہ وقت کا خاتمہ، اشراق و چاشت کے مسنون اوقات اور حج و عمرہ کے ثواب کی بشارت۔
+          </p>
+        </a>
+
+        <a href="#awwabin-tahajjud" class="card card-crest" data-route="awwabin-tahajjud" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">🌙</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">اوابین و تہجد</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            رات کے آخری تہائی حصے کا فلکیاتی حساب اور رب کریم کے قرب کا سب سے بڑا ذریعہ۔
+          </p>
+        </a>
+
+        <a href="#hadith" class="card card-crest" data-route="hadith" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">📜</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">احادیث مبارکہ</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            ۳۰۰ مستند احادیث نبوی مع عربی اعراب، سلیس ترجمہ اور صحیح اسناد۔
+          </p>
+        </a>
+
+        <a href="#quran" class="card card-crest" data-route="quran" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">🕋</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">قرآنی آیات و سورتیں</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            ۱۰ مبارک سورتیں مع مستند سنت کی تفریق اور تجوید کے اصول۔
+          </p>
+        </a>
+
+        <a href="#wazaif" class="card card-crest" data-route="wazaif" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">📿</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">اسلامی وظائف و دعائیں</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            صبح و شام کی مسنون دعائیں اور غم و پریشانی سے نجات کے نبوی اذکار۔
+          </p>
+        </a>
+
+        <a href="#categories" class="card card-crest" data-route="categories" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">📢</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">اسلامی اپڈیٹس و مضامین</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            ۱۰ مستند زمرہ جات میں دینی معلومات، جمعہ مبارک اور شرعی رہنمائی۔
+          </p>
+        </a>
+
+        <a href="#contact" class="card card-crest" data-route="contact" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">✉️</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">رابطہ و سوالات</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            دینی استفسار، ای میل رابطہ اور روزانہ کی اپڈیٹس کے لیے سبسکرپشن۔
+          </p>
+        </a>
+      </div>
+
+      <!-- Email Newsletter Subscription Section -->
+      <div class="email-newsletter-box">
+        <h3 style="font-size:1.9rem; font-weight:700; margin-bottom:8px; color:var(--gold-300);">
+          روزانہ اسلامی اپڈیٹس حاصل کرنے کے لیے سبسکرائب کریں
+        </h3>
+        <p class="urdu-text" style="font-size:1.05rem; color:#f0fdf4; max-width:620px; margin:0 auto;">
+          مستند احادیث، نماز کے اوقات، اسلامی وظائف اور روزمرہ کی دینی رہنمائی براہِ راست اپنے ای میل ان باکس میں حاصل کریں۔
+        </p>
+
+        <form class="newsletter-form-row" onsubmit="handleEmailSubscription(event, this)">
+          <input type="email" class="newsletter-input" placeholder="اپنی ای میل درج کریں (name@example.com)" required dir="ltr">
+          <button type="submit" class="btn-newsletter-submit">سبسکرائب کریں ✉️</button>
+        </form>
+        <div class="newsletter-status-alert" style="margin-top:14px; display:none;"></div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 2: PRAYER TIMES DASHBOARD ================= -->
+    <section id="view-prayer-times" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">مواقیت الصلاۃ برائے پاکستان</span>
+        <h2 class="section-title">نماز کے اوقات</h2>
+        <p class="section-desc">
+          جامعہ علوم اسلامیہ علامہ بنوری ٹاؤن، کراچی کے فلکیاتی معیار اور فقہ حنفی کے مطابق پاکستان کے اہم شہروں کے درست اوقاتِ نماز۔
+        </p>
+      </div>
+
+      <!-- City Selector & Controls Panel -->
+      <div class="city-control-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h3 style="color:var(--emerald-950); margin-bottom:8px; font-size:1.25rem;">
+              اپنا شہر منتخب کریں
+            </h3>
+            <div id="prominent-selected-city-badge" class="selected-city-prominent">
+              <span>📍</span>
+              <span>آپ کا منتخب کردہ شہر: <strong id="selected-city-name-text">وہاڑی، پاکستان</strong></span>
+            </div>
+          </div>
+
+          <!-- Refresh Button with real animation & feedback -->
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn-refresh" id="btn-master-refresh" onclick="triggerManualPrayerRefresh(this)">
+              <span class="refresh-icon">🔄</span>
+              <span>تازہ اوقات حاصل کریں</span>
+            </button>
+
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="requestUserGPSLocation(this)">
+              📍 میرا مقام (GPS)
+            </button>
+          </div>
+        </div>
+
+        <!-- City Dropdown & Search -->
+        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:14px;">
+          <div class="city-search-box">
+            <span class="city-search-icon">🔍</span>
+            <input type="text" id="city-search-filter" class="city-search-input" placeholder="شہر کا نام تلاش کریں (مثلاً وہاڑی، چشتیاں، ملتان)..." oninput="filterCityDropdown(this.value)">
+          </div>
+
+          <div style="flex:1; min-width:220px;">
+            <select id="main-city-dropdown" class="city-select" style="width:100%;" onchange="onCityDropdownChange(this.value)">
+              <!-- Populated dynamically with all 29 Pakistani cities -->
+            </select>
+          </div>
+
+          <div>
+            <select id="main-school-dropdown" class="city-select" onchange="onSchoolDropdownChange(this.value)">
+              <option value="1" selected>فقہ حنفی (Hanafi - دوگنا سایہ)</option>
+              <option value="0">شافعی / جمہور (مثلِ اول)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="refresh-status-container" style="margin-top:10px;"></div>
+
+        <!-- Live Weather Integration Widget (Open-Meteo) -->
+        <div class="weather-card-widget" id="weather-card-widget">
+          <div class="weather-info-group">
+            <span id="weather-icon-display" style="font-size:2.2rem;">☀️</span>
+            <div>
+              <div style="font-size:0.85rem; color:var(--text-muted);">موسم برائے منتخب شہر:</div>
+              <strong id="weather-condition-urdu" style="font-size:1.15rem; color:var(--emerald-900);">صاف مطلع</strong>
+            </div>
+          </div>
+
+          <div class="weather-info-group">
+            <div class="weather-temp-badge">
+              <span id="weather-temp-value">26</span>°C
+            </div>
+            <div style="font-size:0.88rem; color:var(--text-muted); line-height:1.6;">
+              <div>💧 نمی: <strong id="weather-humidity-val">45%</strong></div>
+              <div>🌅 طلوع: <strong id="weather-sunrise-val">--:--</strong> | 🌇 غروب: <strong id="weather-sunset-val">--:--</strong></div>
+            </div>
+          </div>
+
+          <div style="font-size:0.82rem; color:var(--text-muted); border-right:2px solid var(--gold-400); padding-right:12px;">
+            نوٹ: موسمی حالات کا شرعی اوقاتِ نماز کے حساب سے کوئی تعلق نہیں۔
+          </div>
+        </div>
+
+        <!-- Calculation Settings & Source Metadata -->
+        <div style="margin-top:16px; font-size:0.86rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.3); padding-top:12px;">
+          <div>
+            <strong>معیار و طریقہ:</strong> <span id="prayer-calc-method-label">جامعہ علوم اسلامیہ علامہ بنوری ٹاؤن، کراچی</span> |
+            <strong>عصر:</strong> <span id="prayer-calc-asr-label">فقہ حنفی (سایہ دوگنا)</span>
+          </div>
+          <div>
+            <strong>آخری بار تازہ شدہ:</strong> <span id="prayer-last-refresh-time" style="color:var(--emerald-800); font-weight:700;">--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIVE OBLIGATORY PRAYER CARDS -->
+      <div class="section-header" style="margin-bottom:16px;">
+        <span class="section-badge">پانچ فرض نمازیں</span>
+        <h3 class="section-title">آج کی فرض نمازوں کے اوقات</h3>
+        <p style="font-size:0.92rem; color:var(--text-muted);">کسی بھی نماز کے کارڈ پر کلک کر کے اس کی مکمل رکعات اور تفصیلی گائیڈ ملاحظہ فرمائیں۔</p>
+      </div>
+
+      <div class="five-prayers-grid" id="five-prayers-container">
+        <!-- Rendered dynamically via JS with gold border on upcoming prayer -->
+      </div>
+
+      <!-- MAIN PROMINENT DIGITAL COUNTDOWN TO NEXT FARD PRAYER -->
+      <div class="main-fard-countdown-banner" id="main-fard-countdown-banner">
+        <span class="countdown-top-badge">اگلی فرض نماز</span>
+        <div class="countdown-prayer-name" id="main-countdown-prayer-name">نمازِ عصر</div>
+        <div class="digital-timer-clock" id="main-digital-clock">00:00:00</div>
+        <div class="countdown-subtext" id="main-countdown-subtext">نماز شروع ہونے میں باقی وقت</div>
+      </div>
+
+      <!-- CHRONOLOGICAL DAILY 11-EVENTS TIMELINE -->
+      <div class="section-header" style="margin-top:36px; margin-bottom:16px;">
+        <span class="section-badge">یومیہ تقویمِ عبادات</span>
+        <h3 class="section-title">آج کے نماز اور نوافل کے اوقات</h3>
+        <p class="section-desc">
+          منتخب شہر کے فلکیاتی حساب کے مطابق فجر سے لے کر تہجد تک تمام ۱۱ شرعی اوقات ترتیب وار۔
+        </p>
+      </div>
+
+      <div class="daily-timeline-table-wrap">
+        <table class="daily-timeline-table">
+          <thead>
+            <tr>
+              <th>نماز / شرعی وقت</th>
+              <th>نوعیت</th>
+              <th>شروع ہونے کا وقت</th>
+              <th>موجودہ صورتحال</th>
+              <th>باقی وقت (کاؤنٹ ڈاؤن)</th>
+              <th>مختصر وضاحت</th>
+            </tr>
+          </thead>
+          <tbody id="daily-timeline-tbody">
+            <!-- Populated dynamically via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DEDICATED NAFL PRAYER CARDS (Ishraq, Chasht, Zawal, Awwabin, Tahajjud) -->
+      <div class="section-header" style="margin-top:36px; margin-bottom:16px;">
+        <span class="section-badge">نوافل و مستحبات</span>
+        <h3 class="section-title">اشراق، چاشت، زوال، اوابین اور تہجد کے خصوصی کارڈز</h3>
+      </div>
+
+      <div class="nafl-cards-grid" id="nafl-cards-grid">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <div style="text-align:center; margin-top:20px;">
+        <button type="button" class="btn btn-emerald" onclick="openMonthlyTimetableModal()">
+          📅 پورے ۳۰ دن کا ماہانہ ٹائم ٹیبل دیکھیں
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 3: COMPLETE PRAYER GUIDE (مکمل نماز گائیڈ) ================= -->
+    <section id="view-prayer-guide" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">حنفی فقہی ترتیب برائے پاکستان</span>
+        <h2 class="section-title">مکمل نمازوں کی رکعات</h2>
+        <p class="section-desc">
+          پاکستان میں مروج معتبر حنفی مسلک کے مطابق پانچوں نمازوں کی سنت، فرض، واجب اور نفل رکعات کی مکمل تفصیل۔
+        </p>
+      </div>
+
+      <!-- 5 Prayer Rakats Hanafi Summary Cards -->
+      <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-bottom:32px;" id="rakats-summary-grid">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <!-- Detailed Classification Legend -->
+      <div class="card card-crest" style="margin-bottom:32px;">
+        <h3 style="color:var(--emerald-900); font-size:1.35rem; margin-bottom:16px;">
+          شرعی درجات و اصطلاحات کی وضاحت (فرض، واجب، سنت، نفل)
+        </h3>
+        <div id="rakat-classifications-container"></div>
+      </div>
+
+      <!-- Step-by-Step Practical Salah Instructions -->
+      <div class="card card-crest" style="margin-bottom:32px;">
+        <h3 style="color:var(--emerald-900); font-size:1.45rem; margin-bottom:16px;">
+          نماز کا عملی طریقہ مع عربی تسبیحات و اردو ترجمہ
+        </h3>
+        <p class="urdu-text" style="color:var(--text-muted); margin-bottom:20px;">
+          تکبیرِ تحریمہ سے لے کر سلام پھیرنے تک ہر رکن کے مسنون کلمات مع مکمل اعراب:
+        </p>
+        <div id="step-by-step-salah-container"></div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 4: PRAYER VIRTUES (نماز کی فضیلت) ================= -->
+    <section id="view-prayer-virtues" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">قرآن و سنت کی روشنی میں</span>
+        <h2 class="section-title">نماز کی فضیلت اور اہمیت</h2>
+        <p class="section-desc">
+          نماز دین کا ستون، آنکھوں کی ٹھنڈک، اور رب العالمین کے قرب کا عظیم ترین ذریعہ ہے۔
+        </p>
+      </div>
+
+      <div class="cards-grid" style="grid-template-columns: 1fr; max-width:900px; margin:0 auto 36px;">
+        <!-- Punctuality -->
+        <div class="card card-crest">
+          <h3 style="color:var(--emerald-900); margin-bottom:12px;">۱. بروقت نماز کی ادائیگی (الصلاة على وقتها)</h3>
+          <div class="quran-ayah-display">
+            إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا
+          </div>
+          <p class="urdu-text" style="margin-bottom:12px;">
+            <strong>ترجمہ:</strong> بیشک نماز مومنوں پر مقررہ اوقات میں فرض کی گئی ہے۔ (سورۃ النساء: 103)
+          </p>
+          <p class="urdu-text">
+            حضرت عبداللہ بن مسعود رضی اللہ عنہ نے رسول اللہ ﷺ سے دریافت کیا: یا رسول اللہ! اللہ تعالیٰ کو کون سا عمل سب سے زیادہ محبوب ہے؟ آپ ﷺ نے ارشاد فرمایا: "الصَّلَاةُ عَلَى وَقْتِهَا" (اپنے وقت پر نماز ادا کرنا)۔ (صحیح البخاری: 527)
+          </p>
+        </div>
+
+        <!-- Congregation -->
+        <div class="card card-crest">
+          <h3 style="color:var(--emerald-900); margin-bottom:12px;">۲. باجماعت نماز کی فضیلت (۲۷ گنا ثواب)</h3>
+          <p class="urdu-text" style="margin-bottom:12px;">
+            رسول اللہ ﷺ نے فرمایا: "صَلَاةُ الْجَمَاعَةِ تَفْضُلُ صَلَاةَ الْفَذِّ بِسَبْعٍ وَعِشْرِينَ دَرَجَةً" یعنی باجماعت نماز تنہا نماز پڑھنے پر ستائیس گنا فضیلت اور برتری رکھتی ہے۔ (صحیح البخاری: 645، صحیح مسلم: 650)
+          </p>
+          <p class="urdu-text">
+            مسجد کی طرف چل کر جانے والے کے ہر قدم پر ایک گناہ معاف اور ایک نیکی لکھی جاتی ہے۔
+          </p>
+        </div>
+
+        <!-- Virtues of Sunnah Prayers -->
+        <div class="card card-crest">
+          <h3 style="color:var(--emerald-900); margin-bottom:12px;">۳. ۱۲ سنتِ مؤکدہ اور جنت میں محل کی بشارت</h3>
+          <p class="urdu-text" style="margin-bottom:12px;">
+            ام المؤمنین سیدہ ام حبیبہ رضی اللہ عنہا سے روایت ہے کہ رسول اللہ ﷺ نے فرمایا: جو مسلمان بندہ ہر دن اللہ کے لیے فرض کے علاوہ ۱۲ رکعتیں نفل (سنتِ مؤکدہ) پڑھے گا، اللہ تعالیٰ اس کے لیے جنت میں ایک گھر تعمیر فرما دے گا۔ (صحیح مسلم: 728)
+          </p>
+          <p class="urdu-text">
+            یہ بارہ رکعتیں: ۲ فجر سے پہلے، ۴ ظہر سے پہلے، ۲ ظہر کے بعد، ۲ مغرب کے بعد، اور ۲ عشاء کے بعد ہیں۔
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 5: ISHRAQ & CHASHT ================= -->
+    <section id="view-ishraq-chasht" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">صلاۃ الإشراق و الضحیٰ</span>
+        <h2 class="section-title">نمازِ اشراق اور نمازِ چاشت کی مکمل گائیڈ</h2>
+      </div>
+
+      <div class="cards-grid" style="grid-template-columns: 1fr 1fr; max-width:1050px; margin:0 auto 36px;">
+        <div class="card card-crest">
+          <h3 style="color:var(--emerald-900); margin-bottom:12px;">نمازِ اشراق</h3>
+          <p class="urdu-text" style="margin-bottom:14px;">
+            طلوعِ آفتاب کے بعد جب سورج ایک نیزہ بلند ہو جائے (احتیاطاً ۱۵ تا ۲۰ منٹ بعد) تو اشراق کا وقت شروع ہو جاتا ہے۔
+          </p>
+          <div class="quran-ayah-display" style="font-size:1.35rem;">
+            مَنْ صَلَّى الْغَدَاةَ فِي جَمَاعَةٍ ثُمَّ قَعَدَ يَذْكُرُ اللَّهَ حَتَّى تَطْلُعَ الشَّمْسُ، ثُمَّ صَلَّى رَكْعَتَيْنِ كَانَتْ لَهُ كَأَجْرِ حَجَّةٍ وَعُمْرَةٍ
+          </div>
+          <p class="urdu-text">
+            <strong>جامع الترمذی: 586 (حسن)</strong> — جو شخص فجر باجماعت پڑھ کر طلوع تک ذکر میں رہے اور پھر دو رکعت پڑھے، اسے ایک کامل حج اور عمرے کا ثواب ملتا ہے۔
+          </p>
+        </div>
+
+        <div class="card card-crest">
+          <h3 style="color:var(--emerald-900); margin-bottom:12px;">نمازِ چاشت (صلاۃ الضحیٰ)</h3>
+          <p class="urdu-text" style="margin-bottom:14px;">
+            دن چڑھے جب سورج خوب روشن ہو جائے اور گرمی بڑھنے لگے، زوال سے قبل کا وقت چاشت کی نماز کا بہترین وقت ہے۔
+          </p>
+          <div class="quran-ayah-display" style="font-size:1.35rem;">
+            يُصْبِحُ عَلَى كُلِّ سُلَامَى مِنْ أَحَدِكُمْ صَدَقَةٌ... وَيُجْزِئُ مِنْ ذَلِكَ رَكْعَتَانِ يَرْكَعُهُمَا مِنَ الضُّحَى
+          </div>
+          <p class="urdu-text">
+            <strong>صحیح مسلم: 720 (صحیح)</strong> — انسان کے ہر جوڑ پر روزانہ صدقہ ہے، اور چاشت کی دو رکعتیں ان تمام صدقات کے لیے کافی ہو جاتی ہیں۔
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 6: AWWABIN & TAHAJJUD ================= -->
+    <section id="view-awwabin-tahajjud" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">صلاۃ الأوابین و صلاۃ اللیل</span>
+        <h2 class="section-title">نمازِ اوابین اور نمازِ تہجد کی مکمل گائیڈ</h2>
+      </div>
+
+      <div class="cards-grid" style="grid-template-columns: 1fr 1fr; max-width:1050px; margin:0 auto 36px;">
+        <div class="card card-crest">
+          <h3 style="color:var(--emerald-900); margin-bottom:12px;">نمازِ اوابین (مغرب کے بعد کے نوافل)</h3>
+          <p class="urdu-text" style="margin-bottom:14px;">
+            مغرب کے فرض اور سنتِ مؤکدہ ادا کرنے کے بعد عشاء تک ۶ سے ۲۰ رکعات نفل ادا کرنا توبہ کرنے والوں کا طریقہ ہے۔
+          </p>
+          <p class="urdu-text">
+            علمی دیانت کے ساتھ یہ بات واضح رہے کہ صحیح احادیث میں اصل "صلاۃ الاوابین" چاشت کے وقت کو کہا گیا ہے، البتہ فقہائے امت اور اکابرین کے ہاں مغرب کے بعد کے نوافل کو بھی اوابین کہا جاتا ہے اور فضائلِ اعمال میں اس پر عمل مستحب ہے۔
+          </p>
+        </div>
+
+        <div class="card card-crest">
+          <h3 style="color:var(--emerald-900); margin-bottom:12px;">نمازِ تہجد (رات کا آخری تہائی حصہ)</h3>
+          <p class="urdu-text" style="margin-bottom:14px;">
+            رات کی نیند کے بعد بیدار ہو کر ادا کی جانے والی عبادت اولیاء اور صالحین کا سب سے محبوب وظیفہ ہے۔
+          </p>
+          <div class="quran-ayah-display" style="font-size:1.35rem;">
+            يَنْزِلُ رَبُّنَا كُلَّ لَيْلَةٍ إِلَى السَّمَاءِ الدُّنْيَا حِينَ يَبْقَى ثُلُثُ اللَّيْلِ الآخِرُ
+          </div>
+          <p class="urdu-text">
+            <strong>صحیح البخاری: 1145، صحیح مسلم: 758</strong> — جب رات کا آخری تہائی حصہ باقی رہ جاتا ہے تو رب العزت فرماتا ہے: کون ہے جو مجھ سے مانگے کہ میں عطا کروں؟
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW: INDIVIDUAL PRAYER DETAIL VIEWS ================= -->
+    <section id="view-prayer-fajr" class="page-view"></section>
+    <section id="view-prayer-zuhr" class="page-view"></section>
+    <section id="view-prayer-asr" class="page-view"></section>
+    <section id="view-prayer-maghrib" class="page-view"></section>
+    <section id="view-prayer-isha" class="page-view"></section>
+
+    <!-- ================= VIEW 7: HADITH LIBRARY ================= -->
+    <section id="view-hadith" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">السنۃ النبویۃ الصحیحۃ</span>
+        <h2 class="section-title">احادیث مبارکہ</h2>
+        <p class="section-desc">
+          صحیح البخاری، صحیح مسلم، جامع الترمذی، سنن ابی داؤد اور سنن نسائی سے ۳۰۰ مستند احادیث مبارکہ۔
+        </p>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="card" style="margin-bottom:24px;">
+        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+          <input type="text" id="hadith-search-input" class="form-control" style="flex:1; min-width:240px;" placeholder="حدیث تلاش کریں (لفظ، موضوع یا حدیث نمبر)..." oninput="handleHadithSearch(this.value)">
+          <select id="hadith-category-filter" class="form-control" style="width:auto;" onchange="handleHadithCategoryChange(this.value)">
+            <option value="all">تمام موضوعات</option>
+            <option value="ایمان">ایمان و عقیدہ</option>
+            <option value="نماز">نماز و طہارت</option>
+            <option value="اخلاق">اخلاق و آداب</option>
+            <option value="معاملات">معاملات و معاشرت</option>
+            <option value="ذکر">ذکر و دعا</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="hadith-cards-container" class="cards-grid" style="grid-template-columns: 1fr;"></div>
+      <div id="hadith-pagination-container" style="display:flex; justify-content:center; gap:8px; margin-top:24px;"></div>
+    </section>
+
+    <!-- ================= VIEW 8: QURANIC VERSES ================= -->
+    <section id="view-quran" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">کتاب اللہ العزیز</span>
+        <h2 class="section-title">قرآنی آیات و سورتیں</h2>
+        <p class="section-desc">
+          ۱۰ بابرکت قرآنی سورتیں مع مستند سنت کی تفریق، اعراب اور سلیس ترجمہ۔
+        </p>
+      </div>
+      <div id="quran-surahs-container" class="cards-grid" style="grid-template-columns: 1fr;"></div>
+    </section>
+
+    <!-- ================= VIEW 9: ISLAMIC WAZAIF & DUAS ================= -->
+    <section id="view-wazaif" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">حصن المسلم و ادعیہ ماثورہ</span>
+        <h2 class="section-title">اسلامی وظائف و مسنون دعائیں</h2>
+        <p class="section-desc">
+          رسول اللہ ﷺ سے ثابت شدہ صبح و شام اور مصائب و پریشانی سے نجات کے مسنون اذکار۔
+        </p>
+      </div>
+      <div id="wazaif-container" class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));"></div>
+    </section>
+
+    <!-- ================= VIEW 10: ISLAMIC CATEGORIES & UPDATES ================= -->
+    <section id="view-categories" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">دینی معلومات و رہنمائی</span>
+        <h2 class="section-title">اسلامی اپڈیٹس اور علمی زمرہ جات</h2>
+        <p class="section-desc">
+          ۱۰ مستند زمرہ جات میں دینی اپڈیٹس، احادیث، قرآنی آیات، وظائف، درود شریف، اذکار، اور جمعہ کے فضائل۔
+        </p>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-filter-bar" id="category-filter-bar">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <div id="category-posts-container" class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));"></div>
+    </section>
+
+    <!-- ================= VIEW 11: ABOUT US (ہمارے بارے میں) ================= -->
+    <section id="view-about" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">ہماری پہچان و مقصد</span>
+        <h2 class="section-title">ہمارے بارے میں</h2>
+      </div>
+
+      <div class="card card-crest" style="max-width:850px; margin:0 auto; padding:36px; background:#ffffff;">
+        <div style="text-align:center; margin-bottom:24px;">
+          <img src="assets/logo.svg" alt="راہ دین اسلام" style="width:110px; height:110px;">
+          <h3 class="arabic-text" style="font-size:2.2rem; color:var(--emerald-900); margin-top:12px;">راہ دین اسلام</h3>
+          <p class="crescent-badge" style="margin-top:6px; font-size:1rem;">
+            قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش
+          </p>
+        </div>
+
+        <div style="background:var(--ivory-100); border-right:4px solid var(--gold-500); padding:26px; border-radius:8px; margin-bottom:24px;">
+          <p class="urdu-text" style="font-size:1.25rem; line-height:2.5; color:var(--text-dark);">
+            راہ دین اسلام ایک خوبصورت اسلامی پلیٹ فارم ہے، جس کا مقصد قرآن و سنت کی روشنی میں مستند اسلامی تعلیمات، احادیث مبارکہ، اسلامی اپڈیٹس، وظائف، اذکار اور نماز کی رہنمائی عام کرنا ہے۔
+            <br><br>
+            ہماری کوشش ہے کہ ہر مسلمان تک درست اسلامی معلومات آسان، خوبصورت اور مستند حوالوں کے ساتھ پہنچیں۔
+            <br><br>
+            آئیے! دین اسلام کی خوبصورت تعلیمات کو پھیلانے کی اس نیک کوشش کا حصہ بنیں۔
+            <br><br>
+            <strong>راہ دین اسلام — نیکی کے کام میں اپنا حصہ بنائیں۔</strong>
+          </p>
+        </div>
+
+        <div style="border-top:1px dashed rgba(212,175,55,0.4); padding-top:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <strong>رسمی رابطہ ای میل:</strong>
+            <a href="mailto:p9158412@gmail.com" style="color:var(--emerald-700); text-decoration:none; font-family:var(--font-ui); font-weight:700;">
+              p9158412@gmail.com
+            </a>
+          </div>
+          <div>
+            <strong>یوٹیوب چینل:</strong>
+            <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" style="color:#ef4444; text-decoration:none; font-weight:700;">
+              @Rah-e-DeenIslam
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 12: CONTACT US (رابطہ کریں) ================= -->
+    <section id="view-contact" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">رابطہ و رہنمائی</span>
+        <h2 class="section-title">رابطہ کریں</h2>
+        <p class="section-desc">کسی بھی اسلامی سوال، معلومات یا رہنمائی کے لیے ہم سے رابطہ کریں۔</p>
+      </div>
+
+      <div class="cards-grid" style="grid-template-columns: 1fr 1fr; max-width:1050px; margin:0 auto;">
+        <!-- Contact Form -->
+        <div class="card card-crest">
+          <h3 style="color:var(--emerald-900); margin-bottom:16px;">پیغام بھیجیں</h3>
+          <form id="contact-form" onsubmit="handleContactFormSubmit(event)">
+            <div class="form-group">
+              <label for="contact-name" class="form-label">آپ کا نام:</label>
+              <input type="text" id="contact-name" class="form-control" placeholder="اپنا مکمل نام درج کریں" required>
+            </div>
+
+            <div class="form-group">
+              <label for="contact-email" class="form-label">ای میل ایڈریس:</label>
+              <input type="email" id="contact-email" class="form-control" placeholder="name@example.com" required dir="ltr" style="text-align:right;">
+            </div>
+
+            <div class="form-group">
+              <label for="contact-subject" class="form-label">موضوع:</label>
+              <input type="text" id="contact-subject" class="form-control" placeholder="پیغام کا موضوع" required>
+            </div>
+
+            <div class="form-group">
+              <label for="contact-message" class="form-label">پیغام / سوال:</label>
+              <textarea id="contact-message" class="form-control" placeholder="اپنا تفصیلی پیغام یا سوال یہاں تحریر کریں..." required rows="5"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width:100%;">ارسال فرمائیں (Send Message) ✉️</button>
+            <div id="contact-status-msg" style="display:none; margin-top:12px;"></div>
+          </form>
+        </div>
+
+        <!-- Contact Information & Subscription -->
+        <div class="card card-crest" style="background:var(--ivory-50);">
+          <h3 style="color:var(--emerald-900); margin-bottom:16px;">رابطہ کی تفصیلات</h3>
+          
+          <div style="margin-bottom:20px;">
+            <strong>رسمی ای میل ایڈریس:</strong>
+            <p style="margin-top:8px;">
+              <a href="mailto:p9158412@gmail.com" class="btn btn-sm btn-emerald" style="font-family:var(--font-ui); text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:1.05rem;">
+                ✉️ p9158412@gmail.com
+              </a>
+            </p>
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <strong>یوٹیوب آفیشل چینل:</strong>
+            <p style="margin-top:8px;">
+              <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-gold" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                ▶ Rah e Deen Islam (@Rah-e-DeenIslam)
+              </a>
+            </p>
+          </div>
+
+          <!-- Subscription Box inside Contact Us -->
+          <div style="background:var(--emerald-50); border:1.5px solid var(--emerald-600); border-radius:12px; padding:20px; margin-top:24px;">
+            <h4 style="color:var(--emerald-900); margin-bottom:6px; font-size:1.15rem;">اپنی ای میل درج کریں</h4>
+            <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted); margin-bottom:12px;">
+              کسی بھی اسلامی سوال، معلومات یا رہنمائی کے لیے ہم سے رابطہ کریں۔
+            </p>
+
+            <form onsubmit="handleEmailSubscription(event, this)">
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <input type="email" class="form-control" placeholder="اپنی ای میل درج کریں" required dir="ltr" style="flex:1; min-width:200px;">
+                <button type="submit" class="btn btn-sm btn-gold">سبسکرائب کریں</button>
+              </div>
+              <div class="newsletter-status-alert" style="margin-top:8px; display:none;"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Monthly Prayer Timetable Modal -->
+  <div class="modal-overlay" id="monthly-prayer-modal">
+    <div class="modal-card" style="max-width:850px;">
+      <button type="button" class="modal-close-btn" onclick="closeModal('monthly-prayer-modal')">✕</button>
+      <h3 id="monthly-modal-title" style="color:var(--emerald-900); margin-bottom:14px; font-size:1.35rem;">ماہانہ اوقاتِ نماز</h3>
+      <div id="monthly-timetable-body" style="overflow-x:auto;"></div>
+      <div style="margin-top:16px; text-align:center;">
+        <button type="button" class="btn btn-sm btn-emerald" onclick="window.print()">پرنٹ کریں (Print) 🖨️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Toast -->
+  <div id="share-toast" style="position:fixed; bottom:20px; right:20px; background:var(--emerald-900); color:#ffffff; padding:12px 24px; border-radius:50px; border:1.5px solid var(--gold-400); box-shadow:0 8px 24px rgba(0,0,0,0.3); display:none; z-index:99999; font-size:0.95rem;">
+    لینک کاپی ہو گیا ہے! ✅
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+          <img src="assets/logo.svg" alt="راہ دین اسلام" style="width:48px; height:48px;">
+          <h4 style="margin:0; font-size:1.4rem;">راہ دین اسلام</h4>
+        </div>
+        <p style="color:var(--gold-300); font-family:var(--font-ui); font-size:0.88rem; margin-bottom:8px; font-weight:700;">
+          RAH E DEEN ISLAM
+        </p>
+        <p class="urdu-text" style="font-size:0.95rem; line-height:2.2; color:var(--ivory-200);">
+          قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش۔
+          مستند اسلامی تعلیمات، احادیث مبارکہ اور لائیو اوقاتِ نماز۔
+        </p>
+        <div style="margin-top:14px;">
+          <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" style="color:#ef4444; text-decoration:none; font-size:0.92rem; display:inline-flex; align-items:center; gap:6px; font-weight:700;">
+            ▶ یوٹیوب: @Rah-e-DeenIslam
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>اہم صفحات</h4>
+        <ul class="footer-links">
+          <li><a href="#home" data-route="home">ہوم</a></li>
+          <li><a href="#prayer-times" data-route="prayer-times">نماز کے اوقات</a></li>
+          <li><a href="#prayer-guide" data-route="prayer-guide">مکمل نماز گائیڈ</a></li>
+          <li><a href="#prayer-virtues" data-route="prayer-virtues">نماز کی فضیلت</a></li>
+          <li><a href="#ishraq-chasht" data-route="ishraq-chasht">اشراق و چاشت</a></li>
+          <li><a href="#awwabin-tahajjud" data-route="awwabin-tahajjud">اوابین و تہجد</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>اسلامی لائبریری</h4>
+        <ul class="footer-links">
+          <li><a href="#hadith" data-route="hadith">احادیث مبارکہ</a></li>
+          <li><a href="#quran" data-route="quran">قرآنی آیات</a></li>
+          <li><a href="#wazaif" data-route="wazaif">اسلامی وظائف</a></li>
+          <li><a href="#categories" data-route="categories">اسلامی اپڈیٹس</a></li>
+          <li><a href="#about" data-route="about">ہمارے بارے میں</a></li>
+          <li><a href="#contact" data-route="contact">رابطہ کریں</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>رابطہ و سبسکرپشن</h4>
+        <p class="urdu-text" style="font-size:0.92rem; color:var(--ivory-200); margin-bottom:10px;">
+          کسی بھی سوال، رہنمائی یا تجاویز کے لیے ہم سے رابطہ فرمائیں:
+        </p>
+        <p style="margin:12px 0;">
+          <a href="mailto:p9158412@gmail.com" class="btn btn-sm btn-outline-gold" style="font-family:var(--font-ui); text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            ✉️ p9158412@gmail.com
+          </a>
+        </p>
+        <div style="margin-top:14px; font-size:0.85rem; color:var(--gold-300);">
+          — راہ دین اسلام
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>
+        © ۲۰۲۶ راہ دین اسلام (Rah e Deen Islam). جملہ حقوق دینِ حق کی ترویج کے لیے محفوظ ہیں۔
+      </div>
+      <div>
+        — راہ دین اسلام
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts: Engine, Data & Master App Controller -->
+  <script src="js/prayer-times.js"></script>
+  <script src="js/prayer-guide-data.js"></script>
+  <script src="js/categories-data.js"></script>
+  <script src="js/hadith-data.js"></script>
+  <script src="js/quran-data.js"></script>
+  <script src="js/duas-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
