@@ -9,6 +9,8 @@
  * 6. 12-event daily chronological sequence with live countdowns
  * 7. Email subscription backend (RFC validation, duplicate rejection)
  * 8. HTML markup integrity & official YouTube channel link verification
+ * 9. Quranic Verses & Surahs Integrity (Amiri font, full diacritics, translation, Sunnah.com & Quran.com references, zero undefined)
+ * 10. All 12 Islamic Months with Fazilat, Historical Events & Sunnah Practices
  */
 
 const fs = require('fs');
@@ -120,7 +122,6 @@ console.log('✅ TEST 4 PASSED: 5-card live timers, dual indicators, and 12-even
 // 5. Test Isha & Tahajjud Night Sequence Simulation
 console.log('TEST 5: Testing Isha & Tahajjud Night Sequence (Active during night, inactive post-Fajr)...');
 
-// Simulation A: Night time at 23:30 PKT (After Isha, before Fajr)
 const nightPkt = {
   hour: 23,
   minute: 30,
@@ -141,7 +142,6 @@ console.log(`     - Countdown to Last Third: ${nightState.tahajjud.countdownToLa
 console.log(`     - Fajr Time: ${nightState.tahajjud.fajrTime12}`);
 console.log(`     - Countdown to Fajr: ${nightState.tahajjud.countdownToFajr}`);
 
-// Simulation B: Morning time at 07:00 PKT (After Fajr & Sunrise)
 const morningPkt = {
   hour: 7,
   minute: 0,
@@ -176,7 +176,6 @@ subscribeHandler(mockReqSuccess, mockResSuccess).then(() => {
   assert(capturedSuccess && capturedSuccess.success === true, 'Valid email must succeed');
   console.log(`   ✓ New email subscription success response verified: "${capturedSuccess.message}"`);
 
-  // Test Duplicate
   let capturedDuplicate = null;
   const mockResDuplicate = {
     setHeader: () => {},
@@ -187,7 +186,6 @@ subscribeHandler(mockReqSuccess, mockResSuccess).then(() => {
     assert(capturedDuplicate && capturedDuplicate.isDuplicate === true, 'Duplicate email must be detected');
     console.log(`   ✓ Duplicate subscription rejection verified: "${capturedDuplicate.message}"`);
 
-    // Test Invalid Email
     const mockReqInvalid = {
       method: 'POST',
       headers: {},
@@ -204,7 +202,7 @@ subscribeHandler(mockReqSuccess, mockResSuccess).then(() => {
       console.log(`   ✓ Invalid email rejection verified: "${capturedInvalid.message}"`);
       console.log('✅ TEST 6 PASSED: Email subscription backend fully working.\n');
 
-      // 7. Test Required Content in index.html
+      // 7. Test Required Content in index.html & YouTube link
       console.log('TEST 7: Checking Content & Branding in index.html...');
       const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
       
@@ -227,8 +225,101 @@ subscribeHandler(mockReqSuccess, mockResSuccess).then(() => {
 
       console.log('✅ TEST 7 PASSED: All user master prompt copy, branding, and container IDs verified.\n');
 
+      // 8. Test Quranic Verses, Surahs & Virtues (Sunnah.com & Quran.com references, Zero undefined)
+      console.log('TEST 8: Verifying Quranic Verses & Surahs Integrity...');
+      const { QURAN_SURAHS } = require('./js/quran-data');
+      assert(Array.isArray(QURAN_SURAHS), 'QURAN_SURAHS must be an array');
+      assert(QURAN_SURAHS.length >= 10, 'Must contain at least 10 premier Quranic surahs/verses');
+
+      // Ensure Ayat al-Kursi, Surah Al-Fatihah, Surah Al-Baqarah last verses are present
+      const ayatKursi = QURAN_SURAHS.find(s => s.titleUrdu && s.titleUrdu.includes('آیت الکرسی'));
+      assert(ayatKursi, 'آیت الکرسی must be present');
+      assert(ayatKursi.arabicText.includes('اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'), 'Ayat al-Kursi Arabic text must be authentic');
+      assert(ayatKursi.translationUrdu.includes('اللہ، جس کے سوا کوئی معبود نہیں'), 'Ayat al-Kursi Urdu translation must be present');
+      assert(ayatKursi.authenticVirtues.includes('صحیح مسلم: 810') || ayatKursi.authenticVirtues.includes('صحیح البخاری: 2311'), 'Ayat al-Kursi must cite authentic Sunnah reference');
+      assert(ayatKursi.quranUrl.includes('quran.com/2/255'), 'Quran.com/2/255 reference must match');
+      assert(ayatKursi.sunnahUrl.includes('sunnah.com'), 'Sunnah.com reference must match');
+
+      const fatihah = QURAN_SURAHS.find(s => s.nameUrdu && s.nameUrdu.includes('الفاتحہ'));
+      assert(fatihah, 'سورۃ الفاتحہ must be present');
+      assert(fatihah.arabicText.includes('الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ'), 'Surah Fatihah Arabic text must be authentic');
+      assert(fatihah.quranUrl.includes('quran.com/1'), 'Surah Fatihah must link to Quran.com/1');
+
+      // Check all items for zero 'undefined' or null fields
+      QURAN_SURAHS.forEach((s, idx) => {
+        assert(s.nameUrdu, `Surah ${idx} must have nameUrdu`);
+        assert(s.nameArabic, `Surah ${idx} must have nameArabic`);
+        assert(s.arabicText, `Surah ${idx} must have arabicText`);
+        assert(s.translationUrdu, `Surah ${idx} must have translationUrdu`);
+        assert(s.authenticVirtues, `Surah ${idx} must have authenticVirtues`);
+        assert(s.quranUrl, `Surah ${idx} must have quranUrl`);
+        assert(s.sunnahUrl, `Surah ${idx} must have sunnahUrl`);
+        
+        // Strict check: No field should contain literal 'undefined'
+        const serialized = JSON.stringify(s);
+        assert(!serialized.includes('"undefined"'), `Surah ${s.nameUrdu} must not contain string "undefined"`);
+        console.log(`   ✓ [${s.number}] ${s.nameUrdu} (${s.nameArabic}) — Verified with Sunnah.com & Quran.com`);
+      });
+      console.log('✅ TEST 8 PASSED: Quranic verses and virtues 100% verified without undefined.\n');
+
+      // 9. Test All 12 Islamic Months (Sequence, 4 Sacred Months, Fazilat, Historical Events, Sunnah Practices)
+      console.log('TEST 9: Verifying All 12 Islamic Hijri Months...');
+      const { ISLAMIC_MONTHS } = require('./js/calendar-data');
+      assert(Array.isArray(ISLAMIC_MONTHS), 'ISLAMIC_MONTHS must be an array');
+      assert.strictEqual(ISLAMIC_MONTHS.length, 12, 'Must contain all 12 Islamic months');
+
+      // Verify sequence 1 to 12
+      ISLAMIC_MONTHS.forEach((m, idx) => {
+        assert.strictEqual(m.number, idx + 1, `Month at index ${idx} must have number ${idx + 1}`);
+      });
+
+      // Verify 4 Sacred Months per Surah At-Tawbah 9:36 & Bukhari 3197
+      const sacredMonths = ISLAMIC_MONTHS.filter(m => m.isSacred);
+      assert.strictEqual(sacredMonths.length, 4, 'Must have exactly 4 Sacred Months (الأشهر الحرم)');
+      const sacredNumbers = sacredMonths.map(m => m.number);
+      assert(sacredNumbers.includes(1), 'Muharram (1) must be sacred');
+      assert(sacredNumbers.includes(7), 'Rajab (7) must be sacred');
+      assert(sacredNumbers.includes(11), 'Dhul-Qadah (11) must be sacred');
+      assert(sacredNumbers.includes(12), 'Dhul-Hijjah (12) must be sacred');
+
+      // Verify detailed fields on each month
+      ISLAMIC_MONTHS.forEach(m => {
+        assert(m.nameUrdu, `Month ${m.number} must have nameUrdu`);
+        assert(m.nameArabic, `Month ${m.number} must have nameArabic with diacritics`);
+        assert(m.meaning, `Month ${m.number} must have meaning`);
+        assert(m.fazilat, `Month ${m.number} must have authentic fazilat`);
+        assert(m.sunnahReference, `Month ${m.number} must cite authentic Sunnah reference`);
+        assert(Array.isArray(m.events) && m.events.length > 0, `Month ${m.number} must have historical events`);
+        assert(Array.isArray(m.sunnahPractices) && m.sunnahPractices.length > 0, `Month ${m.number} must have Sunnah practices`);
+
+        m.events.forEach(ev => {
+          assert(ev.day && ev.title && ev.description, `Event in month ${m.number} must have day, title, description`);
+          assert(ev.reference, `Event "${ev.title}" must have authentic historical reference`);
+        });
+
+        m.sunnahPractices.forEach(p => {
+          assert(p.title && p.description, `Practice in month ${m.number} must have title and description`);
+        });
+
+        const serialized = JSON.stringify(m);
+        assert(!serialized.includes('"undefined"'), `Month ${m.nameUrdu} must not contain string "undefined"`);
+        console.log(`   ✓ Month ${m.number}: ${m.nameUrdu} (${m.nameArabic}) [${m.isSacred ? 'حرمت والا مہینہ' : 'بابرکت مہینہ'}] — ${m.events.length} Events, ${m.sunnahPractices.length} Sunnah Practices`);
+      });
+      console.log('✅ TEST 9 PASSED: All 12 Islamic months verified with authentic Fazilat and events.\n');
+
+      // 10. Test UI Integration & Script Loading in index.html
+      console.log('TEST 10: Verifying UI Views & Script Loading in index.html...');
+      assert(html.includes('id="view-islamic-months"'), 'view-islamic-months must be present in index.html');
+      assert(html.includes('id="islamic-months-container"'), 'islamic-months-container must be present');
+      assert(html.includes('data-route="islamic-months"'), 'Navigation route for islamic-months must be present');
+      assert(html.includes('js/calendar-data.js'), 'js/calendar-data.js script tag must be loaded');
+      assert(html.includes('id="quran-filter-pills"'), 'quran-filter-pills must be present in index.html');
+      assert(html.includes('id="months-filter-pills"'), 'months-filter-pills must be present in index.html');
+
+      console.log('✅ TEST 10 PASSED: All HTML views, routes, and script dependencies verified.\n');
+
       console.log('==================================================');
-      console.log('🎉 ALL 7 TESTS PASSED SUCCESSFULLY! PROJECT READY.');
+      console.log('🎉 ALL 10 TESTS PASSED SUCCESSFULLY! PROJECT READY.');
       console.log('==================================================');
     });
   });

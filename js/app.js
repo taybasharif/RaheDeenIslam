@@ -681,7 +681,7 @@ function startMasterTimer() {
   }, 1000);
 }
 
-// 10. Render Static Views: Complete Prayer Guide, Rakats, Categories, Hadith, Quran
+// 10. Render Static Views: Complete Prayer Guide, Rakats, Categories, Hadith, Quran, Islamic Months
 function renderAllStaticViews() {
   renderRakatsSummary();
   renderRakatClassifications();
@@ -690,6 +690,9 @@ function renderAllStaticViews() {
   renderCategoryPosts('all');
   renderHadithSection();
   renderQuranSurahs();
+  initQuranControls();
+  renderIslamicMonths();
+  initIslamicMonthsControls();
   renderWazaifSection();
 }
 
@@ -1015,9 +1018,10 @@ function renderHadithSection() {
   if (appState.hadith.searchQuery) {
     const q = appState.hadith.searchQuery.trim().toLowerCase();
     list = list.filter(h => 
-      h.urdu.includes(q) || 
-      h.arabic.includes(q) || 
-      h.source.toLowerCase().includes(q) ||
+      (h.urdu && h.urdu.includes(q)) || 
+      (h.arabic && h.arabic.includes(q)) || 
+      (h.collection && h.collection.toLowerCase().includes(q)) ||
+      (h.source && h.source.toLowerCase().includes(q)) ||
       String(h.id).includes(q)
     );
   }
@@ -1025,31 +1029,39 @@ function renderHadithSection() {
   const start = (appState.hadith.page - 1) * appState.hadith.pageSize;
   const paginated = list.slice(start, start + appState.hadith.pageSize);
 
-  container.innerHTML = paginated.map(h => `
-    <div class="card card-crest">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <span class="crescent-badge">حدیث نمبر: ${h.id} (${h.category})</span>
-        <span style="color:var(--emerald-800); font-weight:700;">${h.source}</span>
-      </div>
+  container.innerHTML = paginated.map(h => {
+    const sourceName = h.collection || h.source || 'صحیح حدیث';
+    const sourceUrl = h.sourceUrl || h.url || 'https://sunnah.com';
+    const grade = h.grade || 'صحیح (Authentic)';
+    const arabic = h.arabic || '';
+    const urdu = h.urdu || '';
 
-      <div class="quran-ayah-display" style="font-size:1.35rem; padding:18px; margin-bottom:14px;">
-        ${h.arabic}
-      </div>
+    return `
+      <div class="card card-crest">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span class="crescent-badge">حدیث نمبر: ${h.id} (${h.category})</span>
+          <span style="color:var(--emerald-800); font-weight:700;">${sourceName}</span>
+        </div>
 
-      <p class="urdu-text" style="font-size:1.15rem; line-height:2.3; margin-bottom:14px;">
-        <strong>ترجمہ:</strong> ${h.urdu}
-      </p>
+        <div class="quran-ayah-display" style="font-size:1.35rem; padding:18px; margin-bottom:14px;">
+          ${arabic}
+        </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.4); padding-top:12px;">
-        <span style="background:var(--emerald-50); color:var(--emerald-800); padding:3px 10px; border-radius:12px; font-weight:600;">
-          ${h.grade || 'صحیح (Authentic)'}
-        </span>
-        <a href="${h.url || 'https://sunnah.com'}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-gold">
-          Sunnah.com پر تصدیق کریں 🔗
-        </a>
+        <p class="urdu-text" style="font-size:1.15rem; line-height:2.3; margin-bottom:14px;">
+          <strong>ترجمہ:</strong> ${urdu}
+        </p>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.4); padding-top:12px;">
+          <span style="background:var(--emerald-50); color:var(--emerald-800); padding:3px 10px; border-radius:12px; font-weight:600;">
+            ${grade}
+          </span>
+          <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-gold">
+            Sunnah.com پر تصدیق کریں 🔗
+          </a>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   renderHadithPagination(list.length);
 }
@@ -1078,64 +1090,333 @@ function changeHadithPage(p) {
   window.scrollTo({ top: 400, behavior: 'smooth' });
 }
 
-// 15. Quran Surahs Section
-function renderQuranSurahs() {
+// 15. Quran Verses & Surahs Section (Amiri Font, Diacritics, Urdu Translation & Sunnah Virtues)
+let currentQuranFilter = 'all';
+let currentQuranSearch = '';
+
+function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQuranSearch) {
+  currentQuranFilter = filter;
+  currentQuranSearch = searchQuery;
   const container = document.getElementById('quran-surahs-container');
   if (!container || typeof QURAN_SURAHS === 'undefined') return;
 
-  container.innerHTML = QURAN_SURAHS.map(s => `
-    <div class="card card-crest">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 style="color:var(--emerald-900); font-size:1.4rem; margin:0;">${s.nameUrdu} (${s.nameAr})</h3>
-        <span class="crescent-badge">پارہ: ${s.para} | آیات: ${s.ayatCount}</span>
+  let list = QURAN_SURAHS;
+
+  if (filter && filter !== 'all') {
+    list = list.filter(s => 
+      (s.category && s.category.includes(filter)) || 
+      (s.titleUrdu && s.titleUrdu.includes(filter))
+    );
+  }
+
+  if (searchQuery) {
+    const q = searchQuery.trim().toLowerCase();
+    list = list.filter(s => 
+      (s.titleUrdu && s.titleUrdu.includes(q)) ||
+      (s.nameUrdu && s.nameUrdu.includes(q)) ||
+      (s.nameArabic && s.nameArabic.includes(q)) ||
+      (s.translationUrdu && s.translationUrdu.includes(q)) ||
+      (s.authenticVirtues && s.authenticVirtues.includes(q)) ||
+      (s.arabicText && s.arabicText.includes(q))
+    );
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="card" style="text-align:center; padding:40px;">
+        <p class="urdu-text" style="font-size:1.15rem; color:var(--text-muted);">کوئی قرآنی آیت یا سورت تلاش کے معیار پر نہیں ملی۔</p>
       </div>
+    `;
+    return;
+  }
 
-      <p class="urdu-text" style="font-size:1.05rem; color:var(--text-dark); margin-bottom:14px;">
-        <strong>فضیلت و سنت نبوی:</strong> ${s.virtue}
-      </p>
+  container.innerHTML = list.map(s => {
+    const titleUrdu = s.titleUrdu || s.nameUrdu || '';
+    const nameArabic = s.nameArabic || s.nameAr || '';
+    const para = s.juz || s.para || 'قرآن مجید';
+    const ayatCount = s.versesCount || s.ayatCount || '';
+    const arabicText = s.arabicText || s.openingAyah || s.bismillahSample || '';
+    const translationUrdu = s.translationUrdu || s.openingTranslation || '';
+    const virtues = s.authenticVirtues || s.fazilat || s.virtue || '';
+    const sunnahRef = s.sunnahReference || '';
+    const sunnahUrl = s.sunnahUrl || 'https://sunnah.com';
+    const quranRef = s.quranReference || `Quran.com/${s.number}`;
+    const quranUrl = s.quranUrl || `https://quran.com/${s.number}`;
+    const categoryBadge = s.category ? `<span class="crescent-badge" style="font-size:0.85rem;">${s.category}</span>` : '';
 
-      <div class="quran-ayah-display" style="font-size:1.45rem; padding:18px; margin-bottom:12px;">
-        ${s.openingAyah}
+    return `
+      <div class="card card-crest" style="margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; border-bottom:1px solid rgba(212,175,55,0.3); padding-bottom:12px;">
+          <div>
+            <h3 style="color:var(--emerald-900); font-size:1.45rem; margin:0 0 4px 0;">
+              ${titleUrdu}
+            </h3>
+            <span style="font-family:'Amiri', serif; font-size:1.35rem; color:var(--gold-600);">${nameArabic}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            ${categoryBadge}
+            <span style="background:var(--ivory-100); color:var(--emerald-900); padding:4px 10px; border-radius:12px; font-weight:700; font-size:0.85rem; border:1px solid var(--ivory-200);">
+              ${para} ${ayatCount ? `| ${ayatCount}` : ''}
+            </span>
+          </div>
+        </div>
+
+        <!-- Full Arabic Quranic Text (Amiri Font with Diacritics) -->
+        <div class="quran-ayah-display" style="font-size:1.55rem; padding:22px; margin-bottom:16px; line-height:2.6;">
+          ${arabicText}
+        </div>
+
+        <!-- Urdu Translation (Tarjuma) -->
+        <div style="background:var(--ivory-50); border:1px solid var(--ivory-200); border-radius:8px; padding:16px; margin-bottom:16px;">
+          <h4 style="color:var(--emerald-900); font-size:1.1rem; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <span>📖</span> <strong>سلیس اردو ترجمہ:</strong>
+          </h4>
+          <p class="urdu-text" style="font-size:1.1rem; line-height:2.4; margin:0; color:var(--text-dark);">
+            ${translationUrdu}
+          </p>
+        </div>
+
+        <!-- Fazilat & Sunnah (فضیلت و برکات) -->
+        <div style="background:linear-gradient(135deg, rgba(6,78,59,0.04) 0%, rgba(212,175,55,0.06) 100%); border-right:4px solid var(--gold-500); padding:16px 18px; border-radius:8px; margin-bottom:16px;">
+          <h4 style="color:var(--emerald-900); font-size:1.15rem; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <span>✨</span> <strong>فضیلت و سنت نبوی (احادیث صحیحہ کی روشنی میں):</strong>
+          </h4>
+          <p class="urdu-text" style="font-size:1.05rem; line-height:2.3; margin:0; color:var(--text-dark);">
+            ${virtues}
+          </p>
+        </div>
+
+        <!-- Dual Verification References (Sunnah.com & Quran.com) -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.4); padding-top:14px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            ${sunnahRef ? `
+            <a href="${sunnahUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-gold" style="font-size:0.85rem; text-decoration:none;">
+              حوالہ سنت: ${sunnahRef} 🔗
+            </a>` : ''}
+          </div>
+          <div>
+            <a href="${quranUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-emerald" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <span>Quran.com پر مطالعہ فرمائیں (${quranRef})</span> 📖
+            </a>
+          </div>
+        </div>
       </div>
-
-      <p class="urdu-text" style="font-size:1.05rem; color:var(--text-muted); margin-bottom:14px;">
-        <strong>ترجمہ:</strong> ${s.openingTranslation}
-      </p>
-
-      <div style="text-align:left;">
-        <a href="https://quran.com/${s.number}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-emerald">
-          Quran.com پر مکمل سورت پڑھیں 📖
-        </a>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
-// 16. Wazaif Section
+function initQuranControls() {
+  const pills = document.querySelectorAll('#quran-filter-pills [data-qfilter]');
+  pills.forEach(btn => {
+    btn.addEventListener('click', () => {
+      pills.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.getAttribute('data-qfilter');
+      renderQuranSurahs(filter, currentQuranSearch);
+    });
+  });
+
+  const searchInput = document.getElementById('quran-search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      currentQuranSearch = e.target.value;
+      renderQuranSurahs(currentQuranFilter, currentQuranSearch);
+    });
+  }
+}
+
+// 16. All 12 Islamic Months Section (Fazilat, Events & Sunnah Practices)
+let currentMonthsFilter = 'all';
+let currentMonthsSearch = '';
+
+function renderIslamicMonths(filter = currentMonthsFilter, searchQuery = currentMonthsSearch) {
+  currentMonthsFilter = filter;
+  currentMonthsSearch = searchQuery;
+  const container = document.getElementById('islamic-months-container');
+  if (!container || typeof ISLAMIC_MONTHS === 'undefined') return;
+
+  let months = ISLAMIC_MONTHS;
+
+  if (filter === 'sacred') {
+    months = months.filter(m => m.isSacred);
+  } else if (filter === 'general') {
+    months = months.filter(m => !m.isSacred);
+  }
+
+  if (searchQuery) {
+    const q = searchQuery.trim().toLowerCase();
+    months = months.filter(m => 
+      (m.nameUrdu && m.nameUrdu.includes(q)) ||
+      (m.nameArabic && m.nameArabic.includes(q)) ||
+      (m.nameEn && m.nameEn.toLowerCase().includes(q)) ||
+      (m.fazilat && m.fazilat.includes(q)) ||
+      (m.meaning && m.meaning.includes(q)) ||
+      (m.events && m.events.some(e => e.title.includes(q) || e.description.includes(q)))
+    );
+  }
+
+  if (months.length === 0) {
+    container.innerHTML = `
+      <div class="card" style="text-align:center; padding:40px;">
+        <p class="urdu-text" style="font-size:1.15rem; color:var(--text-muted);">کوئی اسلامی مہینہ تلاش کے معیار پر پورا نہیں اترا۔</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = months.map(m => {
+    const sacredBadge = m.isSacred
+      ? `<span style="background:#fef3c7; color:#92400e; padding:5px 14px; border-radius:20px; font-weight:700; border:1px solid #d97706; font-size:0.88rem;">حرمت والا مہینہ (الأشهر الحرم) 🛡️</span>`
+      : `<span style="background:var(--emerald-50); color:var(--emerald-900); padding:5px 14px; border-radius:20px; font-weight:700; border:1px solid var(--emerald-600); font-size:0.88rem;">بابرکت اسلامی مہینہ 🌙</span>`;
+
+    const eventsHtml = (m.events || []).map(e => `
+      <div style="background:rgba(255,255,255,0.75); border-right:4px solid var(--emerald-600); padding:12px 16px; margin-bottom:10px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:4px;">
+          <strong style="color:var(--emerald-900); font-size:1.05rem;">📅 ${e.day}: ${e.title}</strong>
+          ${e.reference ? `<span style="font-size:0.82rem; color:var(--text-muted); background:var(--ivory-100); padding:2px 8px; border-radius:10px;">${e.reference}</span>` : ''}
+        </div>
+        <p class="urdu-text" style="font-size:0.95rem; margin:0; line-height:2; color:var(--text-dark);">${e.description}</p>
+      </div>
+    `).join('');
+
+    const practicesHtml = (m.sunnahPractices || []).map(p => `
+      <li style="margin-bottom:8px; line-height:2.1;">
+        <strong style="color:var(--emerald-900);">${p.title}:</strong> ${p.description}
+        ${p.reference ? `<span style="font-size:0.82rem; color:var(--emerald-700); font-weight:700;"> (${p.reference})</span>` : ''}
+      </li>
+    `).join('');
+
+    return `
+      <div class="card card-crest" style="margin-bottom:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(212,175,55,0.3); padding-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:48px; height:48px; border-radius:50%; background:var(--emerald-800); color:var(--gold-300); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; font-family:'Amiri', serif; border:2px solid var(--gold-400);">
+              ${m.number}
+            </div>
+            <div>
+              <h3 style="color:var(--emerald-900); font-size:1.6rem; margin:0;">
+                ${m.nameUrdu} <span style="font-family:'Amiri', serif; font-size:1.45rem; color:var(--gold-600); margin-right:8px;">(${m.nameArabic})</span>
+              </h3>
+              <div style="font-size:0.88rem; color:var(--text-muted); direction:ltr; text-align:right;">${m.nameEn} • Month ${m.number} of Islamic Hijri Calendar</div>
+            </div>
+          </div>
+          <div>
+            ${sacredBadge}
+          </div>
+        </div>
+
+        <!-- Meaning / Origin -->
+        <div style="background:var(--ivory-50); border:1px solid var(--ivory-200); border-radius:8px; padding:10px 16px; margin-bottom:16px;">
+          <strong style="color:var(--emerald-800);">معنی و وجہ تسمیہ:</strong>
+          <span class="urdu-text" style="font-size:0.98rem; color:var(--text-dark); margin-right:6px;">${m.meaning}</span>
+        </div>
+
+        <!-- Fazilat Section -->
+        <div style="margin-bottom:20px; background:linear-gradient(135deg, rgba(6,78,59,0.04) 0%, rgba(212,175,55,0.06) 100%); border-right:4px solid var(--gold-500); padding:16px 18px; border-radius:8px;">
+          <h4 style="color:var(--emerald-900); font-size:1.2rem; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+            <span>✨</span> فضیلت و برکات (قرآن و سنت کی روشنی میں)
+          </h4>
+          <p class="urdu-text" style="font-size:1.05rem; line-height:2.3; margin:0; color:var(--text-dark);">
+            ${m.fazilat}
+          </p>
+          <div style="margin-top:12px; display:flex; gap:12px; flex-wrap:wrap; font-size:0.88rem;">
+            ${m.sunnahReference ? `
+            <a href="${m.sunnahUrl || 'https://sunnah.com'}" target="_blank" rel="noopener noreferrer" style="color:var(--emerald-700); font-weight:700; text-decoration:none;">
+              حوالہ سنت: ${m.sunnahReference} 🔗
+            </a>` : ''}
+            ${m.quranReference ? `
+            <a href="${m.quranUrl || 'https://quran.com'}" target="_blank" rel="noopener noreferrer" style="color:var(--gold-600); font-weight:700; text-decoration:none;">
+              حوالہ قرآن: ${m.quranReference} 📖
+            </a>` : ''}
+          </div>
+        </div>
+
+        <!-- Historical Events -->
+        <div style="margin-bottom:20px;">
+          <h4 style="color:var(--emerald-900); font-size:1.15rem; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <span>📜</span> اس مبارک مہینے کے اہم تاریخی اسلامی واقعات
+          </h4>
+          ${eventsHtml}
+        </div>
+
+        <!-- Sunnah Practices & Guidance -->
+        <div style="background:var(--emerald-50); border:1px solid var(--emerald-600); border-radius:8px; padding:16px 18px; margin-bottom:14px;">
+          <h4 style="color:var(--emerald-900); font-size:1.15rem; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+            <span>🤲</span> مسنون اعمال، نوافل اور شرعی رہنمائی
+          </h4>
+          <ul class="urdu-text" style="font-size:0.98rem; padding-right:20px; margin:0;">
+            ${practicesHtml}
+          </ul>
+          ${m.guidance ? `
+          <div style="margin-top:12px; padding-top:10px; border-top:1px dashed rgba(6,78,59,0.3); font-size:0.92rem; color:#991b1b; font-weight:600;">
+            ⚠️ <strong>اہم شرعی تنبیہ:</strong> ${m.guidance}
+          </div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function initIslamicMonthsControls() {
+  const pills = document.querySelectorAll('#months-filter-pills [data-mfilter]');
+  pills.forEach(btn => {
+    btn.addEventListener('click', () => {
+      pills.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.getAttribute('data-mfilter');
+      renderIslamicMonths(filter, currentMonthsSearch);
+    });
+  });
+
+  const searchInput = document.getElementById('months-search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      currentMonthsSearch = e.target.value;
+      renderIslamicMonths(currentMonthsFilter, currentMonthsSearch);
+    });
+  }
+}
+
+// 17. Wazaif & Duas Section (Zero 'undefined' guaranteed)
 function renderWazaifSection() {
   const container = document.getElementById('wazaif-container');
   if (!container || typeof MASNOON_DUAS === 'undefined') return;
 
-  container.innerHTML = MASNOON_DUAS.map(d => `
-    <div class="card card-crest">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h4 style="color:var(--emerald-900); margin:0; font-size:1.2rem;">${d.title}</h4>
-        <span class="crescent-badge" style="font-size:0.8rem;">${d.timing}</span>
-      </div>
-
-      <div class="quran-ayah-display" style="font-size:1.25rem; padding:14px; margin-bottom:12px;">
-        ${d.arabic}
-      </div>
-
-      <p class="urdu-text" style="font-size:1rem; margin-bottom:12px;">
-        <strong>ترجمہ:</strong> ${d.urdu}
+  container.innerHTML = MASNOON_DUAS.map(d => {
+    const title = d.occasion || d.title || 'مسنون دعا';
+    const timing = d.category || d.timing || 'یومیہ اذکار';
+    const arabic = d.arabic || '';
+    const urdu = d.urdu || '';
+    const source = d.source || 'حصن المسلم';
+    const virtueHtml = d.virtue ? `
+      <p class="urdu-text" style="font-size:0.95rem; color:var(--emerald-800); margin:8px 0;">
+        <strong>فضیلت:</strong> ${d.virtue}
       </p>
+    ` : '';
 
-      <div style="border-top:1px dashed rgba(212,175,55,0.4); padding-top:8px; font-size:0.85rem; color:var(--emerald-800); font-weight:700;">
-        حوالہ: ${d.source}
+    return `
+      <div class="card card-crest">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="color:var(--emerald-900); margin:0; font-size:1.2rem;">${title}</h4>
+          <span class="crescent-badge" style="font-size:0.8rem;">${timing}</span>
+        </div>
+
+        <div class="quran-ayah-display" style="font-size:1.25rem; padding:14px; margin-bottom:12px;">
+          ${arabic}
+        </div>
+
+        <p class="urdu-text" style="font-size:1rem; margin-bottom:12px;">
+          <strong>ترجمہ:</strong> ${urdu}
+        </p>
+
+        ${virtueHtml}
+
+        <div style="border-top:1px dashed rgba(212,175,55,0.4); padding-top:8px; font-size:0.85rem; color:var(--emerald-800); font-weight:700;">
+          حوالہ: ${source}
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // 17. Real Email Subscription Handler

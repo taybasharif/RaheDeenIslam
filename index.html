@@ -83,6 +83,7 @@
           <li><a href="#awwabin-tahajjud" class="nav-link" data-route="awwabin-tahajjud">اوابین و تہجد</a></li>
           <li><a href="#hadith" class="nav-link" data-route="hadith">احادیث مبارکہ</a></li>
           <li><a href="#quran" class="nav-link" data-route="quran">قرآنی آیات</a></li>
+          <li><a href="#islamic-months" class="nav-link" data-route="islamic-months">اسلامی مہینے</a></li>
           <li><a href="#wazaif" class="nav-link" data-route="wazaif">اسلامی وظائف</a></li>
           <li><a href="#categories" class="nav-link" data-route="categories">اسلامی اپڈیٹس</a></li>
           <li><a href="#about" class="nav-link" data-route="about">ہمارے بارے میں</a></li>
@@ -237,10 +238,18 @@
         </a>
 
         <a href="#quran" class="card card-crest" data-route="quran" style="text-decoration:none; color:inherit;">
-          <div style="font-size:2rem; margin-bottom:8px;">🕋</div>
+          <div style="font-size:2rem; margin-bottom:8px;">📖</div>
           <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">قرآنی آیات و سورتیں</h4>
           <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
-            ۱۰ مبارک سورتیں مع مستند سنت کی تفریق اور تجوید کے اصول۔
+            آیت الکرسی و منتخب سورتیں مع مکمل اعراب، سلیس اردو ترجمہ اور احادیثِ صحیحہ سے فضائل۔
+          </p>
+        </a>
+
+        <a href="#islamic-months" class="card card-crest" data-route="islamic-months" style="text-decoration:none; color:inherit;">
+          <div style="font-size:2rem; margin-bottom:8px;">🗓️</div>
+          <h4 style="color:var(--emerald-900); font-size:1.25rem; margin-bottom:6px;">تمام ۱۲ اسلامی مہینے</h4>
+          <p class="urdu-text" style="font-size:0.92rem; color:var(--text-muted);">
+            ہجری تقویم کے ۱۲ مہینوں کے قرآنی و نبوی فضائل، تاریخی اسلامی واقعات اور مسنون اعمال۔
           </p>
         </a>
 
@@ -659,12 +668,54 @@
     <section id="view-quran" class="page-view">
       <div class="section-header">
         <span class="section-badge">کتاب اللہ العزیز</span>
-        <h2 class="section-title">قرآنی آیات و سورتیں</h2>
+        <h2 class="section-title">قرآنی آیات و سورتیں مع فضائل و سلیس تراجم</h2>
         <p class="section-desc">
-          ۱۰ بابرکت قرآنی سورتیں مع مستند سنت کی تفریق، اعراب اور سلیس ترجمہ۔
+          مستند قرآنی آیات (آیت الکرسی، سورۃ الفاتحہ، آخری آیات بقرہ، سورۃ الملک وغیرہ) مع مکمل اعراب (فونٹ امیری)، مستند سلیس ترجمہ، اور Sunnah.com و Quran.com کے مصدقہ حوالہ جات کے ساتھ فضائل و برکات۔
         </p>
       </div>
+
+      <!-- Quran Filter & Search Controls -->
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:14px; margin-bottom:24px; background:var(--ivory-50); padding:16px 20px; border-radius:12px; border:1px solid var(--gold-200);">
+        <div style="display:flex; flex-wrap:wrap; gap:8px;" id="quran-filter-pills">
+          <button type="button" class="category-pill-btn active" data-qfilter="all">تمام آیات و سورتیں</button>
+          <button type="button" class="category-pill-btn" data-qfilter="حفاظت">حفاظت و شفا</button>
+          <button type="button" class="category-pill-btn" data-qfilter="سنت">فضائلِ سنت</button>
+          <button type="button" class="category-pill-btn" data-qfilter="تلاوت">تلاوت و تفکر</button>
+        </div>
+        <div style="flex:1; min-width:260px; max-width:400px;">
+          <input type="text" id="quran-search-input" class="form-input" placeholder="آیت، سورت یا ترجمہ تلاش کریں..." style="margin:0; padding:10px 14px; font-size:0.95rem;">
+        </div>
+      </div>
+
       <div id="quran-surahs-container" class="cards-grid" style="grid-template-columns: 1fr;"></div>
+    </section>
+
+    <!-- ================= VIEW 9: ALL 12 ISLAMIC MONTHS ================= -->
+    <section id="view-islamic-months" class="page-view">
+      <div class="section-header">
+        <span class="section-badge">ہجری تقویم و اسلامی سال</span>
+        <h2 class="section-title">تمام ۱۲ اسلامی مہینے: فضائل، اہم واقعات اور مسنون اعمال</h2>
+        <p class="section-desc">
+          إِنَّ عِدَّةَ الشُّهُورِ عِنْدَ اللَّهِ اثْنَا عَشَرَ شَهْرًا فِي كِتَابِ اللَّهِ (سورۃ التوبہ: 36) — قرآن و سنت کی روشنی میں تمام ۱۲ ہجری مہینوں کے مستند فضائل، تاریخی اسلامی واقعات اور مسنون اعمال مع حوالہ جات۔
+        </p>
+      </div>
+
+      <!-- Islamic Months Filter & Search Bar -->
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:14px; margin-bottom:24px; background:var(--ivory-50); padding:16px 20px; border-radius:12px; border:1px solid var(--gold-200);">
+        <div style="display:flex; flex-wrap:wrap; gap:8px;" id="months-filter-pills">
+          <button type="button" class="category-pill-btn active" data-mfilter="all">تمام ۱۲ مہینے</button>
+          <button type="button" class="category-pill-btn" data-mfilter="sacred">۴ حرمت والے مہینے (الأشهر الحرم)</button>
+          <button type="button" class="category-pill-btn" data-mfilter="general">دیگر بابرکت مہینے</button>
+        </div>
+        <div style="flex:1; min-width:260px; max-width:400px;">
+          <input type="text" id="months-search-input" class="form-input" placeholder="مہینہ یا تاریخی واقعہ تلاش کریں..." style="margin:0; padding:10px 14px; font-size:0.95rem;">
+        </div>
+      </div>
+
+      <!-- Islamic Months Cards Container -->
+      <div id="islamic-months-container" class="cards-grid" style="grid-template-columns: 1fr;">
+        <!-- Rendered dynamically via JS -->
+      </div>
     </section>
 
     <!-- ================= VIEW 9: ISLAMIC WAZAIF & DUAS ================= -->
@@ -881,6 +932,7 @@
         <ul class="footer-links">
           <li><a href="#hadith" data-route="hadith">احادیث مبارکہ</a></li>
           <li><a href="#quran" data-route="quran">قرآنی آیات</a></li>
+          <li><a href="#islamic-months" data-route="islamic-months">اسلامی مہینے</a></li>
           <li><a href="#wazaif" data-route="wazaif">اسلامی وظائف</a></li>
           <li><a href="#categories" data-route="categories">اسلامی اپڈیٹس</a></li>
           <li><a href="#about" data-route="about">ہمارے بارے میں</a></li>
@@ -920,6 +972,7 @@
   <script src="js/categories-data.js"></script>
   <script src="js/hadith-data.js"></script>
   <script src="js/quran-data.js"></script>
+  <script src="js/calendar-data.js"></script>
   <script src="js/duas-data.js"></script>
   <script src="js/app.js"></script>
 </body>
