@@ -1141,7 +1141,6 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
     const sunnahRef = s.sunnahReference || '';
     const sunnahUrl = s.sunnahUrl || 'https://sunnah.com';
     const quranRef = s.quranReference || `سورت نمبر ${s.number}`;
-    const quranUrl = s.quranUrl || `https://quran.com/${s.number}`;
     const categoryBadge = s.category ? `<span class="crescent-badge" style="font-size:0.85rem;">${s.category}</span>` : '';
 
     return `
@@ -1186,7 +1185,7 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
           </p>
         </div>
 
-        <!-- Dual Verification References (Sunnah.com & Quran.com) -->
+        <!-- Verification References (Sunnah.com verification preserved; Quran link removed) -->
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.4); padding-top:14px;">
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             ${sunnahRef ? `
@@ -1195,9 +1194,9 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
             </a>` : ''}
           </div>
           <div>
-            <a href="${quranUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-emerald" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-              <span>قرآن مجید میں مطالعہ فرمائیں (${quranRef})</span> 📖
-            </a>
+            <span style="display:inline-flex; align-items:center; gap:6px; background:var(--ivory-100); color:var(--emerald-900); padding:6px 14px; border-radius:12px; font-weight:700; font-size:0.88rem; border:1px solid rgba(212,175,55,0.35);">
+              <span>📖</span> <span>حوالہ: ${quranRef}</span>
+            </span>
           </div>
         </div>
       </div>
