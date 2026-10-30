@@ -29,5 +29,10 @@
     "email": "verify_test@example.com",
     "subscribedAt": "2026-10-30T19:03:40.792Z",
     "ip": "127.0.0.1"
+  },
+  {
+    "email": "test_1793388483061@example.com",
+    "subscribedAt": "2026-10-30T19:28:03.062Z",
+    "ip": "127.0.0.1"
   }
 ]

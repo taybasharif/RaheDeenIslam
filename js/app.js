@@ -14,7 +14,7 @@
  * - GPS geolocation nearest city detection
  * - Real API refresh with rotation animation and Urdu notification
  * - Open-Meteo weather integration
- * - Working YouTube channel links (@rahedeenislam)
+ * - Working YouTube channel links (@Rah_e_DeenIslam)
  * - Email subscription system with backend API & Urdu validation
  */
 

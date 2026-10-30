@@ -212,8 +212,10 @@ subscribeHandler(mockReqSuccess, mockResSuccess).then(() => {
       assert(html.includes('راہ دین اسلام'), 'Brand name Urdu must be present');
       assert(html.includes('قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش'), 'Tagline must be exact');
       assert(html.includes('p9158412@gmail.com'), 'Official email must be p9158412@gmail.com');
-      assert(html.includes('https://www.youtube.com/@rahedeenislam'), 'Verified YouTube channel URL must be present');
-      assert(!html.includes('https://www.youtube.com/@Rah-e-DeenIslam'), 'Broken 404 YouTube channel URL must NOT be present');
+      assert(html.includes('https://www.youtube.com/@Rah_e_DeenIslam'), 'Official YouTube channel URL must be present');
+      assert(!html.includes('https://www.youtube.com/@Rah-e-DeenIslam'), 'Broken 404 hyphenated YouTube channel URL must NOT be present');
+      assert(fs.existsSync(path.join(__dirname, 'assets', 'youtube-channel-logo.jpg')), 'YouTube channel profile avatar must exist');
+      assert(fs.existsSync(path.join(__dirname, 'assets', 'logo.svg')), 'Website logo must NOT be deleted or altered');
       assert(html.includes('ہمارے یوٹیوب چینل کو سبسکرائب کریں'), 'YouTube heading must match');
       assert(html.includes('روزانہ اسلامی اپڈیٹس حاصل کرنے کے لیے سبسکرائب کریں'), 'Newsletter heading must match');
       assert(html.includes('آپ کا منتخب کردہ شہر:'), 'Selected city indicator must match');
