@@ -1196,15 +1196,12 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
           </p>
         </div>
 
-        <!-- Reference Footnote: Book No, Ayat No & Translation Source (Sunnah.com link & reference completely removed) -->
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.4); padding-top:14px;">
+        <!-- Reference Footnote: Book No & Ayat No -->
+        <div style="display:flex; justify-content:flex-start; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.4); padding-top:14px;">
           <div>
             <span style="display:inline-flex; align-items:center; gap:6px; background:var(--ivory-100); color:var(--emerald-900); padding:6px 14px; border-radius:12px; font-weight:700; font-size:0.88rem; border:1px solid rgba(212,175,55,0.35);">
               <span>📖</span> <span>سورت نمبر: ${s.number} | ${quranRef}</span>
             </span>
-          </div>
-          <div style="font-size:0.85rem; color:var(--emerald-800); font-weight:700;">
-            <span>مستند حوالہ: قرآن مجید (ترجمہ: مولانا محمد جوناگڑھی)</span>
           </div>
         </div>
       </div>
