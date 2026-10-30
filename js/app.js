@@ -1138,9 +1138,8 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
     const arabicText = s.arabicText || s.openingAyah || s.bismillahSample || '';
     const translationUrdu = s.translationUrdu || s.openingTranslation || '';
     const virtues = s.authenticVirtues || s.fazilat || s.virtue || '';
-    const sunnahRef = s.sunnahReference || '';
-    const sunnahUrl = s.sunnahUrl || 'https://sunnah.com';
     const quranRef = s.quranReference || `سورت نمبر ${s.number}`;
+    const quranUrl = s.quranUrl || `https://quran.com/${s.number}`;
     const categoryBadge = s.category ? `<span class="crescent-badge" style="font-size:0.85rem;">${s.category}</span>` : '';
 
     return `
@@ -1160,16 +1159,28 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
           </div>
         </div>
 
-        <!-- Full Arabic Quranic Text (Amiri Font with Diacritics) -->
-        <div class="quran-ayah-display" style="font-size:1.55rem; padding:22px; margin-bottom:16px; line-height:2.6;">
-          ${arabicText}
+        <!-- Full Arabic Quranic Text (Amiri Font with Diacritics) & Quran.com Link for More Reading -->
+        <div class="quran-ayah-display" style="font-size:1.55rem; padding:22px 22px 14px 22px; margin-bottom:16px; line-height:2.6;">
+          <a href="${quranUrl}" target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:none; display:block;" title="Quran.com پر اصل عربی متن تلاوت فرمائیں">
+            ${arabicText}
+          </a>
+          <div style="display:flex; justify-content:flex-end; align-items:center; border-top:1px dashed rgba(212,175,55,0.3); padding-top:10px; margin-top:12px;">
+            <a href="${quranUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-gold" style="font-size:0.82rem; padding:4px 12px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <span>مزید عربی تلاوت (Quran.com)</span> 📖 ↗
+            </a>
+          </div>
         </div>
 
-        <!-- Urdu Translation (Tarjuma) -->
+        <!-- Urdu Translation (Tarjuma) — Maulana Muhammad Junagarhi (QuranEnc) -->
         <div style="background:var(--ivory-50); border:1px solid var(--ivory-200); border-radius:8px; padding:16px; margin-bottom:16px;">
-          <h4 style="color:var(--emerald-900); font-size:1.1rem; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-            <span>📖</span> <strong>سلیس اردو ترجمہ:</strong>
-          </h4>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+            <h4 style="color:var(--emerald-900); font-size:1.1rem; margin:0; display:flex; align-items:center; gap:6px;">
+              <span>📖</span> <strong>سلیس اردو ترجمہ:</strong>
+            </h4>
+            <span style="font-size:0.82rem; color:var(--text-muted); font-weight:700;">
+              (مستند ترجمہ: مولانا محمد جوناگڑھی — QuranEnc)
+            </span>
+          </div>
           <p class="urdu-text" style="font-size:1.1rem; line-height:2.4; margin:0; color:var(--text-dark);">
             ${translationUrdu}
           </p>
@@ -1185,18 +1196,15 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
           </p>
         </div>
 
-        <!-- Verification References (Sunnah.com verification preserved; Quran link removed) -->
+        <!-- Reference Footnote: Book No, Ayat No & Translation Source (Sunnah.com link & reference completely removed) -->
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed rgba(212,175,55,0.4); padding-top:14px;">
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            ${sunnahRef ? `
-            <a href="${sunnahUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-gold" style="font-size:0.85rem; text-decoration:none;">
-              حوالہ سنت: ${sunnahRef} 🔗
-            </a>` : ''}
-          </div>
           <div>
             <span style="display:inline-flex; align-items:center; gap:6px; background:var(--ivory-100); color:var(--emerald-900); padding:6px 14px; border-radius:12px; font-weight:700; font-size:0.88rem; border:1px solid rgba(212,175,55,0.35);">
-              <span>📖</span> <span>حوالہ: ${quranRef}</span>
+              <span>📖</span> <span>سورت نمبر: ${s.number} | ${quranRef}</span>
             </span>
+          </div>
+          <div style="font-size:0.85rem; color:var(--emerald-800); font-weight:700;">
+            <span>مستند حوالہ: قرآن مجید (ترجمہ: مولانا محمد جوناگڑھی)</span>
           </div>
         </div>
       </div>
