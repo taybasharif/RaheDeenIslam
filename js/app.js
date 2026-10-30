@@ -856,7 +856,7 @@ function renderIndividualPrayerPage(prayerKey) {
               <span style="background:var(--emerald-50); color:var(--emerald-800); padding:2px 8px; border-radius:10px; margin-right:8px; font-weight:600;">${h.grading}</span>
             </div>
             <a href="${h.url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-gold">
-              Sunnah.com پر اصل متن ملاحظہ کریں 🔗
+              مستند حدیث کی تصدیق فرمائیں 🔗
             </a>
           </div>
         </div>
@@ -1056,7 +1056,7 @@ function renderHadithSection() {
             ${grade}
           </span>
           <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-gold">
-            Sunnah.com پر تصدیق کریں 🔗
+            مستند حدیث کی تصدیق فرمائیں 🔗
           </a>
         </div>
       </div>
@@ -1140,7 +1140,7 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
     const virtues = s.authenticVirtues || s.fazilat || s.virtue || '';
     const sunnahRef = s.sunnahReference || '';
     const sunnahUrl = s.sunnahUrl || 'https://sunnah.com';
-    const quranRef = s.quranReference || `Quran.com/${s.number}`;
+    const quranRef = s.quranReference || `سورت نمبر ${s.number}`;
     const quranUrl = s.quranUrl || `https://quran.com/${s.number}`;
     const categoryBadge = s.category ? `<span class="crescent-badge" style="font-size:0.85rem;">${s.category}</span>` : '';
 
@@ -1196,7 +1196,7 @@ function renderQuranSurahs(filter = currentQuranFilter, searchQuery = currentQur
           </div>
           <div>
             <a href="${quranUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-emerald" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-              <span>Quran.com پر مطالعہ فرمائیں (${quranRef})</span> 📖
+              <span>قرآن مجید میں مطالعہ فرمائیں (${quranRef})</span> 📖
             </a>
           </div>
         </div>
