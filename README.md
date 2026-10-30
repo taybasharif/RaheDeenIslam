@@ -2,7 +2,7 @@
 ### مستند اسلامی تعلیمی ویب سائٹ برائے پاکستان (۲۰۲۶ء)
 **شعار (Tagline):** *قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش*  
 **رسمی رابطہ ای میل:** [p9158412@gmail.com](mailto:p9158412@gmail.com)  
-**آفیشل یوٹیوب چینل:** [Rah e Deen Islam (@Rah-e-DeenIslam)](https://www.youtube.com/@Rah-e-DeenIslam)  
+**آفیشل یوٹیوب چینل:** [Rah e Deen Islam (@rahedeenislam)](https://www.youtube.com/@rahedeenislam)  
 
 ---
 
@@ -85,7 +85,7 @@
    - عنوان: **ہمارے یوٹیوب چینل کو سبسکرائب کریں**
    - تفصیل: اسلامی ویڈیوز، خوبصورت احادیث، قرآن کریم، اسلامی وظائف اور روزانہ کی دینی رہنمائی حاصل کرنے کے لیے ہمارے یوٹیوب چینل سے جڑیں۔
    - چینل کا نام: `Rah e Deen Islam`
-   - آفیشل یوٹیوب یو آر ایل: [https://www.youtube.com/@Rah-e-DeenIslam](https://www.youtube.com/@Rah-e-DeenIslam)
+   - آفیشل یوٹیوب یو آر ایل: [https://www.youtube.com/@rahedeenislam](https://www.youtube.com/@rahedeenislam)
    - سرخ یوٹیوب سبسکرائب بٹن مع لوگو۔
 
 8. **ای میل سبسکرپشن سسٹم (Email Subscription System):**

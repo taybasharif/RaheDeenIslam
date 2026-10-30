@@ -1,23 +1,21 @@
 /**
  * RAH E DEEN ISLAM | راہ دین اسلام
- * Master Application Controller
- * Handles:
- * - Client-side SPA routing (all 12 pages + 5 individual prayer guides)
+ * Master Application Controller & Live Event Timers Engine
+ * 
+ * Features:
+ * - Real-time synchronized 1-second ticks (HH : MM : SS)
+ * - Live digital countdowns on EVERY prayer card (Fajr, Zuhr, Asr, Maghrib, Isha)
+ * - Dual separate indicators: اگلی فرض نماز and اگلا اہم وقت / نفل نماز
+ * - Dedicated Isha & Tahajjud night sequence (Isha to Fajr, Last Third calculation)
+ * - Chronological 12-event sequence with live countdowns on each row
+ * - All Nafl timers: Ishraq (~18 min after sunrise), Chasht, Zawal, Awwabin, Tahajjud
  * - Dynamic city dropdown population and real-time search
  * - Prominent selected city updates & LocalStorage persistence
  * - GPS geolocation nearest city detection
  * - Real API refresh with rotation animation and Urdu notification
  * - Open-Meteo weather integration
- * - Five obligatory prayer cards with Next-Fard golden highlight
- * - 1-second live countdown to next Fard prayer
- * - Chronological 11-event daily timeline with live countdowns
- * - Dedicated Nafl cards (Ishraq, Chasht, Zawal, Awwabin, Tahajjud)
- * - Complete Prayer Guide & Hanafi Rakats tables
- * - Individual Prayer detailed pages with authentic Sunnah.com references
- * - Hadith library (search, filter, pagination, copy)
- * - Islamic Categories (10 categories with filter pills and share)
+ * - Working YouTube channel links (@rahedeenislam)
  * - Email subscription system with backend API & Urdu validation
- * - Contact inquiry submission
  */
 
 // Application State
@@ -141,7 +139,6 @@ function handleRouteChange(route) {
   if (targetView) {
     showPageView(targetViewId);
   } else {
-    // Fallback to home
     showPageView('view-home');
   }
 
@@ -339,6 +336,8 @@ function updatePrayerUI() {
   if (!timings) return;
 
   const pktDate = prayerService.getPakistanDate();
+  const eventState = prayerService.getDetailedEventState(pktDate);
+  if (!eventState) return;
 
   // Update Calculation Metadata in Panel
   const methodLabel = document.getElementById('prayer-calc-method-label');
@@ -349,60 +348,78 @@ function updatePrayerUI() {
   if (asrLabel) asrLabel.textContent = timings.schoolLabel;
   if (refreshTime) refreshTime.textContent = timings.lastUpdated;
 
-  // Next Fard Prayer Calculation
-  const nextFardInfo = prayerService.getNextFardPrayer(pktDate);
+  // 1. Current Event Live Alert Bar
+  renderCurrentEventBanner(eventState);
 
-  // Render Five Fard Cards
-  renderFivePrayerCards(timings, nextFardInfo);
+  // 2. Five Obligatory Prayer Cards (with live countdown on EVERY card)
+  renderFivePrayerCards(eventState);
 
-  // Render Main Live Countdown Banner
-  renderMainCountdownBanner(nextFardInfo);
+  // 3. Dual Indicators: (1. اگلی فرض نماز | 2. اگلا اہم وقت / نفل نماز)
+  renderDualIndicators(eventState);
 
-  // Render Chronological Timeline Table
+  // 4. Dedicated Isha & Tahajjud Night Sequence Section
+  renderTahajjudNightPanel(eventState, timings);
+
+  // 5. Chronological 12-Event Daily Timeline Table
   renderChronologicalTimeline(pktDate);
 
-  // Render Nafl Cards
-  renderNaflCards(timings, pktDate);
+  // 6. Dedicated Nafl Cards (Ishraq, Chasht, Zawal, Awwabin, Tahajjud)
+  renderNaflCards(eventState);
 
-  // Render Quick Bar Pills
-  renderQuickBarPills(timings, nextFardInfo);
+  // 7. Quick Bar Pills
+  renderQuickBarPills(timings, eventState);
 
-  // Render Home Quick Widget
-  renderHomeQuickWidget(timings, nextFardInfo);
+  // 8. Home Live Widget
+  renderHomeLiveWidget(timings, eventState);
 }
 
-// 9. Render Five Obligatory Prayer Cards
-function renderFivePrayerCards(timings, nextFardInfo) {
+// Render Current Active Event Banner
+function renderCurrentEventBanner(eventState) {
+  const container = document.getElementById('current-event-banner');
+  if (!container || !eventState.currentEvent) return;
+
+  const ev = eventState.currentEvent;
+  container.innerHTML = `
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-size:1.6rem;">⏱️</span>
+      <div>
+        <div style="font-size:0.85rem; color:var(--gold-300);">موجودہ وقت:</div>
+        <strong style="font-size:1.25rem; color:#ffffff;">${ev.nameUrdu} کا وقت جاری ہے</strong>
+        <span style="font-size:0.88rem; color:var(--gold-100); margin-right:8px;">(${ev.desc})</span>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:0.88rem; color:var(--gold-200);">وقت ختم ہونے میں باقی:</span>
+      <span class="nafl-timer-clock-badge" style="background:#022c22; color:var(--gold-300); border-color:var(--gold-400);">${ev.countdownFormatted}</span>
+    </div>
+  `;
+}
+
+// Render Five Obligatory Prayer Cards (With Live HH : MM : SS Countdown on Every Card)
+function renderFivePrayerCards(eventState) {
   const container = document.getElementById('five-prayers-container');
-  if (!container) return;
+  if (!container || !eventState.fivePrayers) return;
 
-  const t12 = timings.timings12;
-  const tUrdu = timings.timingsUrdu;
-
-  const prayers = [
-    { id: 'fajr', name: 'فجر', time: t12.Fajr, timeUrdu: tUrdu.Fajr, icon: '🌄', rakats: '۴ رکعات (۲ سنت + ۲ فرض)' },
-    { id: 'dhuhr', name: 'ظہر', time: t12.Dhuhr, timeUrdu: tUrdu.Dhuhr, icon: '☀️', rakats: '۱۲ رکعات (۴ سنت + ۴ فرض + ۲ سنت + ۲ نفل)' },
-    { id: 'asr', name: 'عصر', time: t12.Asr, timeUrdu: tUrdu.Asr, icon: '🌤️', rakats: '۸ رکعات (۴ سنت + ۴ فرض)' },
-    { id: 'maghrib', name: 'مغرب', time: t12.Maghrib, timeUrdu: tUrdu.Maghrib, icon: '🌇', rakats: '۷ رکعات (۳ فرض + ۲ سنت + ۲ نفل)' },
-    { id: 'isha', name: 'عشاء', time: t12.Isha, timeUrdu: tUrdu.Isha, icon: '🌙', rakats: '۱۷ رکعات (۴ سنت + ۴ فرض + ۲ سنت + ۲ نفل + ۳ وتر + ۲ نفل)' }
-  ];
-
-  const nextId = nextFardInfo?.nextPrayer?.id;
-
-  container.innerHTML = prayers.map(p => {
-    const isNext = p.id === nextId;
-    const highlightClass = isNext ? 'next-highlight' : '';
+  container.innerHTML = eventState.fivePrayers.map(p => {
+    const highlightClass = p.isNext ? 'next-highlight' : '';
 
     return `
       <a href="#prayer-${p.id}" class="prayer-fard-card ${highlightClass}" data-route="prayer-${p.id}">
         <div class="prayer-fard-icon">${p.icon}</div>
         <div class="prayer-fard-name">${p.name}</div>
-        <div class="prayer-fard-time">${p.time}</div>
+        <div class="prayer-fard-time">${p.time12}</div>
         <div class="prayer-fard-time-urdu">${p.timeUrdu}</div>
+        
+        <!-- Live Digital Countdown Box on Every Prayer Card -->
+        <div class="prayer-card-countdown-box">
+          <div class="prayer-card-countdown-label">${p.countdownLabel}</div>
+          <div class="prayer-card-countdown-digits">${p.countdownFormatted}</div>
+        </div>
+
         <div style="font-size:0.82rem; color:var(--emerald-800); font-weight:600; margin-bottom:8px;">${p.rakats}</div>
         <div>
-          <span class="prayer-fard-status ${isNext ? 'status-upcoming' : 'status-passed'}">
-            ${isNext ? 'اگلی فرض نماز' : 'مکمل گائیڈ دیکھیں ←'}
+          <span class="prayer-fard-status ${p.isCurrent ? 'status-current' : (p.isNext ? 'status-upcoming' : (p.isPassed ? 'status-passed' : 'status-upcoming'))}">
+            ${p.statusUrdu}
           </span>
         </div>
       </a>
@@ -410,22 +427,99 @@ function renderFivePrayerCards(timings, nextFardInfo) {
   }).join('');
 }
 
-// 10. Render Main Live Countdown Banner
-function renderMainCountdownBanner(nextFardInfo) {
-  const nameEl = document.getElementById('main-countdown-prayer-name');
-  const clockEl = document.getElementById('main-digital-clock');
-  const subtextEl = document.getElementById('main-countdown-subtext');
+// Render Dual Indicators: 1. اگلی فرض نماز | 2. اگلا اہم وقت / نفل نماز
+function renderDualIndicators(eventState) {
+  const fardName = document.getElementById('dual-fard-name');
+  const fardClock = document.getElementById('dual-fard-clock');
+  const fardSub = document.getElementById('dual-fard-subtext');
 
-  if (!nextFardInfo || !nameEl || !clockEl) return;
+  const naflName = document.getElementById('dual-nafl-name');
+  const naflClock = document.getElementById('dual-nafl-clock');
+  const naflSub = document.getElementById('dual-nafl-subtext');
 
-  nameEl.textContent = `${nextFardInfo.nextPrayer.nameUrdu} (${nextFardInfo.nextPrayer.time12})`;
-  clockEl.textContent = nextFardInfo.formattedCountdown;
-  if (subtextEl) {
-    subtextEl.textContent = 'نماز شروع ہونے میں باقی وقت';
+  if (fardName && eventState.nextFard) {
+    fardName.textContent = `${eventState.nextFard.nameUrdu} (${eventState.nextFard.time12})`;
+  }
+  if (fardClock && eventState.nextFard) {
+    fardClock.textContent = eventState.nextFard.countdownFormatted;
+  }
+  if (fardSub) {
+    fardSub.textContent = 'نماز شروع ہونے میں باقی وقت';
+  }
+
+  if (naflName && eventState.nextEventOrNafl) {
+    naflName.textContent = `${eventState.nextEventOrNafl.nameUrdu} (${eventState.nextEventOrNafl.time12})`;
+  }
+  if (naflClock && eventState.nextEventOrNafl) {
+    naflClock.textContent = eventState.nextEventOrNafl.countdownFormatted;
+  }
+  if (naflSub && eventState.nextEventOrNafl) {
+    naflSub.textContent = `وقت شروع ہونے میں باقی وقت (${eventState.nextEventOrNafl.desc})`;
   }
 }
 
-// 11. Render Chronological 11-Event Daily Timeline Table
+// Render Dedicated Isha & Tahajjud Night Sequence Section
+function renderTahajjudNightPanel(eventState, timings) {
+  const container = document.getElementById('tahajjud-night-panel');
+  if (!container || !eventState.tahajjud) return;
+
+  const th = eventState.tahajjud;
+
+  container.innerHTML = `
+    <div class="tahajjud-panel-header">
+      <div>
+        <span class="crescent-badge" style="background:rgba(212,175,55,0.2); color:var(--gold-300); border-color:var(--gold-400); margin-bottom:6px;">
+          ${th.badgeText}
+        </span>
+        <h3 style="font-size:1.75rem; color:#ffffff; margin:4px 0;">
+          ${th.statusUrdu}
+        </h3>
+        <p class="urdu-text" style="color:var(--ivory-200); font-size:0.95rem; margin:0;">
+          تہجد کا جائز وقت عشاء کی نماز کے بعد سے صبح صادق تک ہے، جبکہ افضل ترین وقت رات کا آخری تہائی حصہ ہے۔
+        </p>
+      </div>
+
+      <div style="text-align:left;">
+        <span style="font-size:0.85rem; color:var(--gold-300);">آخری تہائی کا آغاز:</span>
+        <div style="font-family:var(--font-ui); font-size:1.6rem; font-weight:800; color:var(--gold-400); direction:ltr;">
+          ${th.lastThirdStartTime12}
+        </div>
+      </div>
+    </div>
+
+    <div class="tahajjud-panel-grid">
+      <!-- Isha Time -->
+      <div class="tahajjud-stat-box">
+        <div class="tahajjud-stat-label">نمازِ عشاء کا وقت</div>
+        <div class="tahajjud-stat-value" style="color:var(--gold-300);">${timings.timings12.Isha}</div>
+        <div style="font-size:0.78rem; color:var(--ivory-300); margin-top:4px;">تہجد کے جائز وقت کا آغاز</div>
+      </div>
+
+      <!-- Night Period -->
+      <div class="tahajjud-stat-box">
+        <div class="tahajjud-stat-label">تہجد کا شرعی دورانیہ</div>
+        <div style="font-size:1.05rem; font-weight:700; color:#ffffff; margin:6px 0;">${th.nightPeriodText}</div>
+        <div style="font-size:0.78rem; color:var(--gold-300);">نیند کے بعد بیداری مسنون ہے</div>
+      </div>
+
+      <!-- Countdown to Last Third -->
+      <div class="tahajjud-stat-box" style="border-color:var(--gold-400); background:rgba(212,175,55,0.1);">
+        <div class="tahajjud-stat-label">${th.isLastThirdActive ? 'آخری تہائی ختم ہونے میں:' : 'آخری تہائی رات میں باقی:'}</div>
+        <div class="tahajjud-stat-value" style="color:#fde047;">${th.isLastThirdActive ? th.countdownToFajr : th.countdownToLastThird}</div>
+        <div style="font-size:0.78rem; color:var(--gold-200); margin-top:4px;">${th.isLastThirdActive ? 'تہجد کا افضل ترین وقت جاری ہے' : 'رب کے خاص نزولِ رحمت کا وقت'}</div>
+      </div>
+
+      <!-- Fajr Time & Countdown -->
+      <div class="tahajjud-stat-box">
+        <div class="tahajjud-stat-label">فجر کا وقت (تہجد کا اختتام)</div>
+        <div class="tahajjud-stat-value" style="color:var(--gold-300);">${th.fajrTime12}</div>
+        <div style="font-size:0.78rem; color:var(--ivory-300); margin-top:4px;">فجر میں باقی: ${th.countdownToFajr}</div>
+      </div>
+    </div>
+  `;
+}
+
+// Render Chronological 12-Event Timeline Table
 function renderChronologicalTimeline(pktDate) {
   const tbody = document.getElementById('daily-timeline-tbody');
   if (!tbody) return;
@@ -452,61 +546,20 @@ function renderChronologicalTimeline(pktDate) {
         <td>${typeBadge}</td>
         <td><span style="font-family:var(--font-ui); font-weight:700; color:var(--emerald-900);">${ev.time12}</span></td>
         <td><span class="prayer-fard-status status-${ev.statusClass}">${ev.statusUrdu}</span></td>
-        <td><span style="font-family:var(--font-ui); font-weight:700; color:var(--gold-600);">${ev.countdownStr}</span></td>
+        <td><span style="font-family:'Plus Jakarta Sans',monospace; font-weight:800; color:var(--gold-600); letter-spacing:1px; direction:ltr; display:inline-block;">${ev.countdownStr}</span></td>
         <td style="font-size:0.88rem; color:var(--text-muted);">${ev.desc}</td>
       </tr>
     `;
   }).join('');
 }
 
-// 12. Render Dedicated Nafl Cards (Ishraq, Chasht, Zawal, Awwabin, Tahajjud)
-function renderNaflCards(timings, pktDate) {
+// Render Dedicated Nafl Cards with Live Countdowns
+function renderNaflCards(eventState) {
   const container = document.getElementById('nafl-cards-grid');
-  if (!container) return;
+  if (!container || !eventState.naflCards) return;
 
-  const t = timings.timings;
-  const t12 = timings.timings12;
-
-  const cards = [
-    {
-      title: 'نمازِ اشراق',
-      badge: 'صبح کے نوافل',
-      timeText: `${t12.Ishraq} تا ${t12.IshraqEnd}`,
-      rule: 'طلوعِ آفتاب کے ۱۵ تا ۲۰ منٹ بعد (مکروہ وقت ختم ہونے پر)',
-      hadithBrief: 'حج و عمرہ کا کامل ثواب (جامع الترمذی: 586)'
-    },
-    {
-      title: 'نمازِ چاشت (صلاۃ الضحیٰ)',
-      badge: 'رزق و برکت',
-      timeText: `${t12.Chasht} تا زوال`,
-      rule: 'دن چڑھے زوال سے قبل، کم از کم ۲ اور زیادہ سے زیادہ ۱۲ رکعات',
-      hadithBrief: 'جسم کے تمام جوڑوں کا روزانہ صدقہ (صحیح مسلم: 720)'
-    },
-    {
-      title: 'وقتِ زوال (مکروہ وقت)',
-      badge: 'نماز سے اجتناب',
-      timeText: `${t12.ZawalStart} تا ${t12.Dhuhr}`,
-      rule: 'نصف النہار کا وقت، اس وقفے میں نفل اور سجدہ مکروہِ تحریمی ہے',
-      hadithBrief: 'سورج ڈھلنے تک نماز نہ پڑھنے کی شرعی نہی'
-    },
-    {
-      title: 'نمازِ اوابین',
-      badge: 'توبہ کرنے والوں کی نماز',
-      timeText: `${t12.Awwabin} تا ${t12.Isha}`,
-      rule: 'مغرب کے بعد ۶ سے ۲۰ رکعات (دو دو رکعت کر کے)',
-      hadithBrief: 'فضائلِ اعمال میں امت کے معمول بہا نوافل'
-    },
-    {
-      title: 'نمازِ تہجد (صلاۃ اللیل)',
-      badge: 'رات کا آخری تہائی',
-      timeText: `${t12.Tahajjud} تا ${t12.Fajr}`,
-      rule: 'رات کے آخری تہائی حصے میں رب کے دربار میں حاضری',
-      hadithBrief: 'دعا کی قبولیت اور مغفرت کا خاص وقت (صحیح بخاری: 1145)'
-    }
-  ];
-
-  container.innerHTML = cards.map(c => `
-    <div class="nafl-timer-card">
+  container.innerHTML = eventState.naflCards.map(c => `
+    <div class="nafl-timer-card ${c.isActive ? 'active' : ''}">
       <div class="card-head">
         <div class="nafl-title">${c.title}</div>
         <span class="crescent-badge" style="font-size:0.8rem;">${c.badge}</span>
@@ -514,6 +567,13 @@ function renderNaflCards(timings, pktDate) {
       <div style="margin-bottom:10px;">
         <span class="nafl-time-badge">${c.timeText}</span>
       </div>
+
+      <!-- Live Digital Countdown on Nafl Card -->
+      <div class="prayer-card-countdown-box">
+        <div class="prayer-card-countdown-label">${c.countdownLabel}</div>
+        <div class="prayer-card-countdown-digits">${c.countdownFormatted}</div>
+      </div>
+
       <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:8px;">
         <strong>شرعی وقت:</strong> ${c.rule}
       </p>
@@ -524,8 +584,8 @@ function renderNaflCards(timings, pktDate) {
   `).join('');
 }
 
-// 13. Render Quick Bar Pills
-function renderQuickBarPills(timings, nextFardInfo) {
+// Render Quick Bar Pills
+function renderQuickBarPills(timings, eventState) {
   const container = document.getElementById('quick-prayer-pills');
   if (!container) return;
 
@@ -547,43 +607,72 @@ function renderQuickBarPills(timings, nextFardInfo) {
   `).join('');
 }
 
-// 14. Render Home Quick Widget
-function renderHomeQuickWidget(timings, nextFardInfo) {
+// Render Home Live Widget
+function renderHomeLiveWidget(timings, eventState) {
   const container = document.getElementById('home-live-countdown-container');
-  if (!container || !nextFardInfo) return;
+  if (!container || !eventState.nextFard) return;
 
   const city = timings.city;
 
   container.innerHTML = `
-    <div class="main-fard-countdown-banner" style="margin-bottom:28px;">
-      <span class="countdown-top-badge">📍 ${city.nameUrdu}، پاکستان — اگلی فرض نماز</span>
-      <div class="countdown-prayer-name">${nextFardInfo.nextPrayer.nameUrdu} (${nextFardInfo.nextPrayer.time12})</div>
-      <div class="digital-timer-clock">${nextFardInfo.formattedCountdown}</div>
-      <div class="countdown-subtext">نماز شروع ہونے میں باقی وقت</div>
-      <div style="margin-top:16px;">
-        <a href="#prayer-times" class="btn btn-sm btn-gold" data-route="prayer-times">
-          مکمل اوقات و ٹائم ٹیبل دیکھیں ←
-        </a>
+    <div class="dual-indicators-container" style="margin-bottom:28px;">
+      <!-- Next Fard Indicator -->
+      <div class="indicator-card">
+        <span class="indicator-badge">📍 ${city.nameUrdu}، پاکستان — اگلی فرض نماز</span>
+        <div class="indicator-title">${eventState.nextFard.nameUrdu} (${eventState.nextFard.time12})</div>
+        <div class="indicator-clock">${eventState.nextFard.countdownFormatted}</div>
+        <div class="indicator-subtext">نماز شروع ہونے میں باقی وقت</div>
+        <div style="margin-top:14px;">
+          <a href="#prayer-times" class="btn btn-sm btn-gold" data-route="prayer-times">
+            مکمل اوقات و کاؤنٹ ڈاؤن ٹائمر دیکھیں ←
+          </a>
+        </div>
+      </div>
+
+      <!-- Next Recommended / Nafl Indicator -->
+      <div class="indicator-card nafl-indicator">
+        <span class="indicator-badge">اگلا اہم وقت / نفل نماز</span>
+        <div class="indicator-title">${eventState.nextEventOrNafl.nameUrdu} (${eventState.nextEventOrNafl.time12})</div>
+        <div class="indicator-clock">${eventState.nextEventOrNafl.countdownFormatted}</div>
+        <div class="indicator-subtext">${eventState.nextEventOrNafl.desc}</div>
+        <div style="margin-top:14px;">
+          <a href="#prayer-times" class="btn btn-sm btn-outline-gold" data-route="prayer-times">
+            یومیہ تقویمِ عبادات دیکھیں ←
+          </a>
+        </div>
       </div>
     </div>
   `;
 }
 
-// 15. Master 1-Second Timer Loop
+// 9. Master 1-Second Timer Loop
 function startMasterTimer() {
   setInterval(() => {
     if (!prayerService.currentTimings) return;
     const pktDate = prayerService.getPakistanDate();
-    const nextFardInfo = prayerService.getNextFardPrayer(pktDate);
+    const eventState = prayerService.getDetailedEventState(pktDate);
+    if (!eventState) return;
 
-    // Update Digital Clock Element
-    const clockEl = document.getElementById('main-digital-clock');
-    if (clockEl && nextFardInfo) {
-      clockEl.textContent = nextFardInfo.formattedCountdown;
-    }
+    // 1. Current Event Live Alert Bar
+    renderCurrentEventBanner(eventState);
 
-    // Refresh timeline countdown cells
+    // 2. Five Obligatory Prayer Cards
+    renderFivePrayerCards(eventState);
+
+    // 3. Dual Indicators
+    renderDualIndicators(eventState);
+
+    // 4. Tahajjud Night Panel
+    renderTahajjudNightPanel(eventState, prayerService.currentTimings);
+
+    // 5. Daily Chronological Table
     renderChronologicalTimeline(pktDate);
+
+    // 6. Nafl Cards
+    renderNaflCards(eventState);
+
+    // 7. Home Widget
+    renderHomeLiveWidget(prayerService.currentTimings, eventState);
 
     // Midnight Check: Recalculate if date changes
     if (prayerService.lastFetchedDateStr && prayerService.lastFetchedDateStr !== pktDate.dateStrDDMMYYYY) {
@@ -592,7 +681,7 @@ function startMasterTimer() {
   }, 1000);
 }
 
-// 16. Render Static Views: Complete Prayer Guide, Rakats, Categories, Hadith, Quran
+// 10. Render Static Views: Complete Prayer Guide, Rakats, Categories, Hadith, Quran
 function renderAllStaticViews() {
   renderRakatsSummary();
   renderRakatClassifications();
@@ -694,7 +783,7 @@ function renderStepByStepSalah() {
   `).join('');
 }
 
-// 17. Render Individual Prayer Detail Pages
+// 11. Render Individual Prayer Detail Pages
 function renderIndividualPrayerPage(prayerKey) {
   const targetView = document.getElementById(`view-prayer-${prayerKey}`);
   if (!targetView || typeof INDIVIDUAL_PRAYERS_DETAIL === 'undefined') return;
@@ -792,7 +881,7 @@ function renderIndividualPrayerPage(prayerKey) {
   `;
 }
 
-// 18. Islamic Categories & Posts
+// 12. Islamic Categories & Posts
 function renderCategoryFilterPills() {
   const container = document.getElementById('category-filter-bar');
   if (!container || typeof ISLAMIC_CATEGORIES === 'undefined') return;
@@ -861,7 +950,7 @@ function renderCategoryPosts(catId) {
   `).join('');
 }
 
-// 19. Copy & Share Functions
+// 13. Copy & Share Functions
 function copyPostToClipboard(encodedText) {
   const text = decodeURIComponent(encodedText);
   if (navigator.clipboard) {
@@ -900,7 +989,7 @@ function showToast(msg) {
   }, 3000);
 }
 
-// 20. Hadith Section
+// 14. Hadith Section
 function handleHadithSearch(query) {
   appState.hadith.searchQuery = query;
   appState.hadith.page = 1;
@@ -989,7 +1078,7 @@ function changeHadithPage(p) {
   window.scrollTo({ top: 400, behavior: 'smooth' });
 }
 
-// 21. Quran Surahs Section
+// 15. Quran Surahs Section
 function renderQuranSurahs() {
   const container = document.getElementById('quran-surahs-container');
   if (!container || typeof QURAN_SURAHS === 'undefined') return;
@@ -1022,7 +1111,7 @@ function renderQuranSurahs() {
   `).join('');
 }
 
-// 22. Wazaif Section
+// 16. Wazaif Section
 function renderWazaifSection() {
   const container = document.getElementById('wazaif-container');
   if (!container || typeof MASNOON_DUAS === 'undefined') return;
@@ -1049,7 +1138,7 @@ function renderWazaifSection() {
   `).join('');
 }
 
-// 23. Real Email Subscription Handler
+// 17. Real Email Subscription Handler
 async function handleEmailSubscription(event, form) {
   event.preventDefault();
   const input = form.querySelector('input[type="email"]');
@@ -1119,7 +1208,7 @@ function showSubscriptionFeedback(box, msg, type) {
   `;
 }
 
-// 24. Contact Form Submission Handler
+// 18. Contact Form Submission Handler
 function handleContactFormSubmit(event) {
   event.preventDefault();
   const statusMsg = document.getElementById('contact-status-msg');
@@ -1136,7 +1225,7 @@ function handleContactFormSubmit(event) {
   event.target.reset();
 }
 
-// 25. Monthly Timetable Modal
+// 19. Monthly Timetable Modal
 function openMonthlyTimetableModal() {
   const modal = document.getElementById('monthly-prayer-modal');
   const body = document.getElementById('monthly-timetable-body');

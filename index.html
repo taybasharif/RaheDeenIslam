@@ -47,7 +47,7 @@
     </div>
 
     <div style="display:flex; align-items:center; gap:16px;">
-      <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" style="color:var(--gold-300); text-decoration:none; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px;">
+      <a href="https://www.youtube.com/@rahedeenislam" target="_blank" rel="noopener noreferrer" style="color:var(--gold-300); text-decoration:none; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px;">
         <span style="color:#ef4444;">▶</span> یوٹیوب چینل
       </a>
       <a href="mailto:p9158412@gmail.com" style="color:#ffffff; text-decoration:none; font-size:0.9rem; font-family:var(--font-ui);">
@@ -139,18 +139,22 @@
 
       <!-- YouTube Official Channel Subscription Section -->
       <div class="youtube-subscribe-section">
-        <div style="font-size:2.6rem; color:#ef4444; margin-bottom:8px;">▶️</div>
+        <a href="https://www.youtube.com/@rahedeenislam" target="_blank" rel="noopener noreferrer" style="font-size:3rem; text-decoration:none; display:inline-block; margin-bottom:8px; filter:drop-shadow(0 2px 8px rgba(239,68,68,0.5));" title="یوٹیوب چینل پر جائیں">
+          ▶️
+        </a>
         <h3 style="font-size:1.85rem; font-weight:700; margin-bottom:12px; color:#ffffff;">
           ہمارے یوٹیوب چینل کو سبسکرائب کریں
         </h3>
         <p class="urdu-text" style="font-size:1.15rem; max-width:700px; margin:0 auto; color:#fee2e2;">
           اسلامی ویڈیوز، خوبصورت احادیث، قرآن کریم، اسلامی وظائف اور روزانہ کی دینی رہنمائی حاصل کرنے کے لیے ہمارے یوٹیوب چینل سے جڑیں۔
         </p>
-        <div style="margin-top:8px;">
-          <span style="font-weight:700; color:#fca5a5; font-size:1.05rem;">چینل: Rah e Deen Islam</span>
+        <div style="margin-top:10px;">
+          <a href="https://www.youtube.com/@rahedeenislam" target="_blank" rel="noopener noreferrer" style="font-weight:700; color:#fca5a5; font-size:1.1rem; text-decoration:none;">
+            چینل: Rah e Deen Islam (@rahedeenislam) 🔗
+          </a>
         </div>
-        <div>
-          <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" class="youtube-subscribe-btn">
+        <div style="margin-top:16px;">
+          <a href="https://www.youtube.com/@rahedeenislam" target="_blank" rel="noopener noreferrer" class="youtube-subscribe-btn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
             </svg>
@@ -377,23 +381,44 @@
         </div>
       </div>
 
-      <!-- FIVE OBLIGATORY PRAYER CARDS -->
+      <!-- CURRENT ACTIVE EVENT BANNER -->
+      <div id="current-event-banner" class="current-event-banner">
+        <!-- Rendered dynamically via JS every second -->
+      </div>
+
+      <!-- FIVE OBLIGATORY PRAYER CARDS (WITH LIVE DIGITAL COUNTDOWN ON EVERY CARD) -->
       <div class="section-header" style="margin-bottom:16px;">
         <span class="section-badge">پانچ فرض نمازیں</span>
-        <h3 class="section-title">آج کی فرض نمازوں کے اوقات</h3>
-        <p style="font-size:0.92rem; color:var(--text-muted);">کسی بھی نماز کے کارڈ پر کلک کر کے اس کی مکمل رکعات اور تفصیلی گائیڈ ملاحظہ فرمائیں۔</p>
+        <h3 class="section-title">آج کی فرض نمازوں کے اوقات مع لائیو کاؤنٹ ڈاؤن</h3>
+        <p style="font-size:0.92rem; color:var(--text-muted);">ہر کارڈ پر لائیو کاؤنٹ ڈاؤن، موجودہ صورتحال اور تفصیلی شرعی رہنمائی ملاحظہ فرمائیں۔</p>
       </div>
 
       <div class="five-prayers-grid" id="five-prayers-container">
-        <!-- Rendered dynamically via JS with gold border on upcoming prayer -->
+        <!-- Rendered dynamically via JS every second with HH : MM : SS digital clocks -->
       </div>
 
-      <!-- MAIN PROMINENT DIGITAL COUNTDOWN TO NEXT FARD PRAYER -->
-      <div class="main-fard-countdown-banner" id="main-fard-countdown-banner">
-        <span class="countdown-top-badge">اگلی فرض نماز</span>
-        <div class="countdown-prayer-name" id="main-countdown-prayer-name">نمازِ عصر</div>
-        <div class="digital-timer-clock" id="main-digital-clock">00:00:00</div>
-        <div class="countdown-subtext" id="main-countdown-subtext">نماز شروع ہونے میں باقی وقت</div>
+      <!-- DUAL SEPARATE INDICATORS (1. اگلی فرض نماز | 2. اگلا اہم وقت / نفل نماز) -->
+      <div class="dual-indicators-container" id="dual-indicators-container">
+        <!-- Box 1: Next Obligatory Prayer -->
+        <div class="indicator-card">
+          <span class="indicator-badge">اگلی فرض نماز</span>
+          <div class="indicator-title" id="dual-fard-name">نمازِ عصر</div>
+          <div class="indicator-clock" id="dual-fard-clock">00 : 00 : 00</div>
+          <div class="indicator-subtext" id="dual-fard-subtext">نماز شروع ہونے میں باقی وقت</div>
+        </div>
+
+        <!-- Box 2: Next Recommended Event / Nafl -->
+        <div class="indicator-card nafl-indicator">
+          <span class="indicator-badge">اگلا اہم وقت / نفل نماز</span>
+          <div class="indicator-title" id="dual-nafl-name">طلوعِ آفتاب</div>
+          <div class="indicator-clock" id="dual-nafl-clock">00 : 00 : 00</div>
+          <div class="indicator-subtext" id="dual-nafl-subtext">وقت شروع ہونے میں باقی وقت</div>
+        </div>
+      </div>
+
+      <!-- DEDICATED ISHA & TAHAJJUD NIGHT SEQUENCE PANEL -->
+      <div id="tahajjud-night-panel" class="tahajjud-night-panel">
+        <!-- Rendered dynamically via JS every second -->
       </div>
 
       <!-- CHRONOLOGICAL DAILY 11-EVENTS TIMELINE -->
@@ -401,7 +426,7 @@
         <span class="section-badge">یومیہ تقویمِ عبادات</span>
         <h3 class="section-title">آج کے نماز اور نوافل کے اوقات</h3>
         <p class="section-desc">
-          منتخب شہر کے فلکیاتی حساب کے مطابق فجر سے لے کر تہجد تک تمام ۱۱ شرعی اوقات ترتیب وار۔
+          منتخب شہر کے فلکیاتی حساب کے مطابق فجر سے لے کر تہجد تک تمام ۱۱ شرعی اوقات ترتیب وار مع لائیو کاؤنٹ ڈاؤن۔
         </p>
       </div>
 
@@ -418,7 +443,7 @@
             </tr>
           </thead>
           <tbody id="daily-timeline-tbody">
-            <!-- Populated dynamically via JS -->
+            <!-- Populated dynamically via JS every second -->
           </tbody>
         </table>
       </div>
@@ -430,7 +455,7 @@
       </div>
 
       <div class="nafl-cards-grid" id="nafl-cards-grid">
-        <!-- Rendered dynamically via JS -->
+        <!-- Rendered dynamically via JS every second -->
       </div>
 
       <div style="text-align:center; margin-top:20px;">
@@ -708,8 +733,8 @@
           </div>
           <div>
             <strong>یوٹیوب چینل:</strong>
-            <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" style="color:#ef4444; text-decoration:none; font-weight:700;">
-              @Rah-e-DeenIslam
+            <a href="https://www.youtube.com/@rahedeenislam" target="_blank" rel="noopener noreferrer" style="color:#ef4444; text-decoration:none; font-weight:700;">
+              @rahedeenislam
             </a>
           </div>
         </div>
@@ -770,8 +795,8 @@
           <div style="margin-bottom:20px;">
             <strong>یوٹیوب آفیشل چینل:</strong>
             <p style="margin-top:8px;">
-              <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-gold" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-                ▶ Rah e Deen Islam (@Rah-e-DeenIslam)
+              <a href="https://www.youtube.com/@rahedeenislam" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-gold" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                ▶ Rah e Deen Islam (@rahedeenislam)
               </a>
             </p>
           </div>
@@ -832,8 +857,8 @@
           مستند اسلامی تعلیمات، احادیث مبارکہ اور لائیو اوقاتِ نماز۔
         </p>
         <div style="margin-top:14px;">
-          <a href="https://www.youtube.com/@Rah-e-DeenIslam" target="_blank" rel="noopener noreferrer" style="color:#ef4444; text-decoration:none; font-size:0.92rem; display:inline-flex; align-items:center; gap:6px; font-weight:700;">
-            ▶ یوٹیوب: @Rah-e-DeenIslam
+          <a href="https://www.youtube.com/@rahedeenislam" target="_blank" rel="noopener noreferrer" style="color:#ef4444; text-decoration:none; font-size:0.92rem; display:inline-flex; align-items:center; gap:6px; font-weight:700;">
+            ▶ یوٹیوب: @rahedeenislam
           </a>
         </div>
       </div>
