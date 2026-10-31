@@ -23,7 +23,7 @@ const MIME_TYPES = {
   '.ttf': 'font/ttf'
 };
 
-function handler(req, res) {
+async function handler(req, res) {
   // CORS & Security Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
