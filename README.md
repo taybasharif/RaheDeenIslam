@@ -1,6 +1,8 @@
 # راہ دین اسلام | RAH E DEEN ISLAM
 ### مستند اسلامی تعلیمی ویب سائٹ برائے پاکستان (۲۰۲۶ء)
 **شعار (Tagline):** *قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش*  
+**🌐 لائیو پروڈکشن ویب سائٹ:** [https://rahedeen-islam-orcin.vercel.app/](https://rahedeen-islam-orcin.vercel.app/)  
+**📦 گٹ ہب ریپوزیٹری:** [https://github.com/taybasharif/RaheDeenIslam](https://github.com/taybasharif/RaheDeenIslam)  
 **رسمی رابطہ ای میل:** [p9158412@gmail.com](mailto:p9158412@gmail.com)  
 **آفیشل یوٹیوب چینل:** [Rah e Deen Islam (@Rah_e_DeenIslam)](https://www.youtube.com/@Rah_e_DeenIslam)  
 
@@ -155,25 +157,13 @@ node server.js
 
 ---
 
-## ۵. گٹ ہب اور ورسل پر تعیناتی (GitHub & Vercel Deployment)
+## ۵. گٹ ہب اور ورسل پر لائیو تعیناتی (Live Deployment & GitHub)
 
-### گٹ ہب پر پش کرنے کے مراحل:
-```bash
-git init
-git add .
-git commit -m "Initial release of Rah e Deen Islam Islamic Portal"
-git branch -M main
-git remote add origin https://github.com/<YOUR_USERNAME>/rah-e-deen-islam.git
-git push -u origin main
-```
+- **گٹ ہب ریپوزیٹری:** [https://github.com/taybasharif/RaheDeenIslam](https://github.com/taybasharif/RaheDeenIslam)
+- **لائیو پروڈکشن ڈومین:** [https://rahedeen-islam-orcin.vercel.app/](https://rahedeen-islam-orcin.vercel.app/)
 
-### ورسل (Vercel) پر تعیناتی:
-1. [Vercel](https://vercel.com) پر لاگ ان کریں اور **Add New Project** پر کلک کریں۔
-2. اپنے گٹ ہب اکاؤنٹ سے `rah-e-deen-islam` ریپوزٹری منتخب کریں۔
-3. فریم ورک پرسیٹ: **Other** (چونکہ پروجیکٹ میں اسٹیٹک ایچ ٹی ایم ایل + سرور لیس فنکشنز ہیں)۔
-4. روٹ ڈائریکٹری: `./`
-5. **Deploy** پر کلک کریں۔
-6. ورسل چند سیکنڈ میں لائیو پروڈکشن یو آر ایل جاری کر دے گا۔
+### ورسل (Vercel) پر خودکار ڈپلائمنٹ:
+ویب سائٹ گٹ ہب ریپوزیٹری کی `main` برانچ سے جڑی ہوئی ہے۔ گٹ ہب پر ہر نئی تبدیلی کے پش ہوتے ہی ورسل خودکار طور پر نئی پروڈکشن بلڈ تیار کر کے [https://rahedeen-islam-orcin.vercel.app/](https://rahedeen-islam-orcin.vercel.app/) پر لائیو کر دیتا ہے۔
 
 ---
 
