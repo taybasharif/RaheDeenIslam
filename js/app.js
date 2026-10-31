@@ -892,34 +892,57 @@ function renderHomeLiveWidget(timings, eventState) {
   const nextNaflClock = nextNafl.countdownFormatted || '00 : 00 : 00';
   const nextNaflDesc = nextNafl.desc || 'یومیہ تقویمِ عبادات';
 
-  // Night Tahajjud Banner (Active between Isha and Fajr)
+  // Current Active Event Name
+  const currentEv = eventState.currentEvent || {};
+  const currentEventName = currentEv.nameUrdu || 'نماز';
+  const currentStatusText = `${currentEventName} کا وقت جاری ہے`;
+
+  // Determine immediate next prayer/event target
+  let targetNextName = nextFardName;
+  let targetNextTime = nextFardTime;
+  let targetNextClock = nextFardClock;
+
   const th = eventState.tahajjud || {};
   const isNight = th.isNightWindow;
-  const tahajjudClock = th.activeCountdownFormatted || th.countdownToLastThird || '00 : 00 : 00';
   const tahajjudTime = (timings && timings.timings12 && timings.timings12.Tahajjud) || th.lastThirdTime12 || '01:15 AM';
 
-  let tahajjudHtml = '';
-  if (isNight) {
-    tahajjudHtml = `
-      <div class="card card-crest" style="background:linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%); color:#ffffff; padding:20px; border-radius:14px; border:2px solid var(--gold-400); margin-bottom:20px; text-align:center;">
-        <span class="crescent-badge" style="background:rgba(212,175,55,0.25); color:var(--gold-300); border-color:var(--gold-400); margin-bottom:6px; display:inline-block; font-size:0.88rem; padding:4px 14px; border-radius:20px;">
-          🌙 عشاء کے بعد کا وقت — نمازِ تہجد و صلاۃ اللیل
-        </span>
-        <h4 style="font-size:1.35rem; color:#ffffff; margin:6px 0;">
-          تہجد کا وقت (رات کا آخری تہائی حصہ): <span style="color:var(--gold-300);">${tahajjudTime}</span>
-        </h4>
-        <div style="font-size:0.9rem; color:var(--ivory-200); margin-bottom:10px;">
-          تہجد کا لائیو کاؤنٹ ڈاؤن (گھنٹے : منٹ : سیکنڈ):
-        </div>
-        <div style="font-family:'Plus Jakarta Sans', monospace; font-size:1.85rem; font-weight:800; color:var(--gold-300); letter-spacing:2px; direction:ltr; display:inline-block; background:rgba(0,0,0,0.4); padding:6px 20px; border-radius:10px; border:1px solid rgba(212,175,55,0.4);">
-          ⏳ ${tahajjudClock}
-        </div>
-      </div>
-    `;
+  if (isNight && !th.isLastThirdActive) {
+    targetNextName = 'نمازِ تہجد';
+    targetNextTime = tahajjudTime;
+    targetNextClock = th.countdownToLastThird || '00 : 00 : 00';
+  } else if (nextNafl && nextNafl.nameUrdu && nextNafl.countdownFormatted && nextNafl.countdownFormatted !== '00 : 00 : 00') {
+    targetNextName = nextNafl.nameUrdu;
+    targetNextTime = nextNafl.time12;
+    targetNextClock = nextNafl.countdownFormatted;
   }
 
+  // Hero Status Banner (User Requested Exact Structure: "عشاء کا وقت جاری ہے | اگلی نماز [نمازِ تہجد] میں اتنا وقت باقی ہے")
+  const heroBannerHtml = `
+    <div class="card card-crest live-status-hero-banner" style="background:linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%); color:#ffffff; padding:24px 20px; border-radius:16px; border:2px solid var(--gold-400); margin-bottom:24px; text-align:center; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
+      <!-- Live Pulse Dot & Current Prayer Status -->
+      <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.2); padding:6px 20px; border-radius:30px; border:1px solid var(--gold-400); margin-bottom:12px;">
+        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#22c55e; box-shadow:0 0 10px #22c55e;"></span>
+        <strong style="color:var(--gold-300); font-size:1.15rem;">${currentStatusText}</strong>
+      </div>
+
+      <!-- Prominent Urdu Heading: اگلی نماز میں اتنا وقت باقی ہے -->
+      <h3 style="font-size:1.55rem; color:#ffffff; margin:8px 0 12px; font-weight:700;">
+        اگلی نماز <span style="color:var(--gold-300); text-decoration:underline; text-underline-offset:6px;">[${targetNextName}]</span> میں اتنا وقت باقی ہے:
+      </h3>
+
+      <!-- Digital Countdown Clock with ⏳ -->
+      <div style="font-family:'Plus Jakarta Sans', monospace; font-size:2.5rem; font-weight:800; color:var(--gold-300); letter-spacing:3px; direction:ltr; display:inline-block; background:rgba(0,0,0,0.5); padding:10px 28px; border-radius:12px; border:2px solid rgba(212,175,55,0.6); box-shadow:inset 0 2px 8px rgba(0,0,0,0.4); margin-bottom:10px;">
+        ⏳ ${targetNextClock}
+      </div>
+
+      <div style="font-size:0.95rem; color:var(--ivory-200); margin-top:6px;">
+        (گھنٹے : منٹ : سیکنڈ — سیکنڈ بہ سیکنڈ لائیو کاؤنٹ ڈاؤن | وقت: <strong style="color:var(--gold-300);">${targetNextTime}</strong> | شہر: <strong style="color:var(--gold-300);">${cityName}</strong>)
+      </div>
+    </div>
+  `;
+
   container.innerHTML = `
-    ${tahajjudHtml}
+    ${heroBannerHtml}
 
     <div class="dual-indicators-container" style="margin-bottom:20px;">
       <!-- Next Fard Indicator -->
@@ -927,10 +950,10 @@ function renderHomeLiveWidget(timings, eventState) {
         <span class="indicator-badge">📍 ${cityName} — اگلی فرض نماز</span>
         <div class="indicator-title">${nextFardName} (${nextFardTime})</div>
         <div class="indicator-clock">⏳ ${nextFardClock}</div>
-        <div class="indicator-subtext">نماز شروع ہونے میں باقی وقت (گھنٹے : منٹ : سیکنڈ)</div>
+        <div class="indicator-subtext">فرض نماز کا وقت (گھنٹے : منٹ : سیکنڈ)</div>
         <div style="margin-top:14px;">
           <a href="#prayer-times" class="btn btn-sm btn-gold" data-route="prayer-times">
-            مکمل ۱۲ اوقات و کاؤنٹ ڈاؤن جدول ←
+            مکمل ۱۲ اوقات و جدول دیکھیں ←
           </a>
         </div>
       </div>
@@ -947,7 +970,7 @@ function renderHomeLiveWidget(timings, eventState) {
           </a>
         </div>
       </div>
-    </div>
+    </div>`;
 
     <!-- Quick Punjab Cities Switcher on Home Page -->
     <div style="background:var(--ivory-50); border:1.5px solid var(--gold-400); border-radius:14px; padding:18px 20px; text-align:center; margin-bottom:28px;">

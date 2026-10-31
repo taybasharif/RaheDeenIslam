@@ -757,10 +757,11 @@ class PrayerTimeEngine {
       nextEventOrNafl = { nameUrdu: 'نمازِ عشاء', type: 'fard', time12: t12.Isha, desc: 'اگلی فرض نماز', startM: m.isha };
     } else {
       // Night Time: Isha to Fajr
-      currentEvent = { nameUrdu: 'نمازِ عشاء و شب بیداری', type: 'fard_night', time12: t12.Isha, desc: 'عشاء کا وقت اور رات کا قیام جاری ہے', endM: m.fajr };
       if (!isLastThirdActive && secUntilLastThird > 0) {
-        nextEventOrNafl = { nameUrdu: 'نمازِ تہجد (آخری تہائی)', type: 'nafl', time12: t12.Tahajjud, desc: 'رات کا آخری تہائی حصہ (تہجد کا افضل ترین وقت)', startM: m.lastThird };
+        currentEvent = { nameUrdu: 'نمازِ عشاء', type: 'fard_night', time12: t12.Isha, desc: 'عشاء کا وقت جاری ہے', endM: m.lastThird };
+        nextEventOrNafl = { nameUrdu: 'نمازِ تہجد', type: 'nafl', time12: t12.Tahajjud, desc: 'رات کا آخری تہائی حصہ (تہجد کا افضل ترین وقت)', startM: m.lastThird };
       } else {
+        currentEvent = { nameUrdu: 'نمازِ تہجد (آخری تہائی)', type: 'nafl', time12: t12.Tahajjud, desc: 'تہجد کا افضل ترین وقت جاری ہے (رات کا آخری تہائی)', endM: m.fajr };
         nextEventOrNafl = { nameUrdu: 'نمازِ فجر', type: 'fard', time12: t12.Fajr, desc: 'اگلی صبح کی پہلی فرض نماز', startM: m.fajr };
       }
     }
