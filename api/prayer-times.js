@@ -20,10 +20,10 @@ module.exports = async function handler(req, res) {
 
   try {
     const url = new URL(req.url, `http://${req.headers?.host || 'localhost'}`);
-    const cityKey = (url.searchParams.get('city') || 'vehari').toLowerCase();
+    const cityKey = (url.searchParams.get('city') || 'lahore').toLowerCase();
     const school = parseInt(url.searchParams.get('school'), 10) || 1;
 
-    const city = PAK_CITIES[cityKey] || PAK_CITIES['vehari'];
+    const city = PAK_CITIES[cityKey] || PAK_CITIES['lahore'];
     const pktDate = prayerService.getPakistanDate();
     const timings = prayerService.calculateOfflineTimings(city, school, pktDate, cityKey);
 

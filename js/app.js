@@ -35,7 +35,7 @@ const appState = {
 };
 
 // Initialize Application
-document.addEventListener('DOMContentLoaded', async () => {
+async function initApp() {
   initDateHeaders();
   initNavigation();
   initCitySelector();
@@ -43,7 +43,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadPrayerData();
   startMasterTimer();
   renderAllStaticViews();
-});
+  if (window._pendingCityKey) {
+    onCityDropdownChange(window._pendingCityKey);
+    window._pendingCityKey = null;
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 
 // 1. Gregorian & Hijri Date Header Display
 function initDateHeaders() {
@@ -225,6 +235,11 @@ function filterCityDropdown(query) {
 async function onCityDropdownChange(cityKey) {
   if (!cityKey || !PAK_CITIES[cityKey]) return;
   appState.selectedCity = cityKey;
+  try {
+    localStorage.setItem('rahedeen_city', cityKey);
+    localStorage.setItem('rahedeen_city_explicit', 'true');
+  } catch (e) {}
+
   prayerService.setCity(cityKey);
 
   // Sync both dropdowns
@@ -234,7 +249,45 @@ async function onCityDropdownChange(cityKey) {
   if (mainDropdown) mainDropdown.value = cityKey;
 
   updateProminentCityDisplay(cityKey);
-  await prayerService.fetchTimings(cityKey, appState.selectedSchool, false);
+  updateActiveCityButtons(cityKey);
+
+  // 1. INSTANT LOCAL ASTRONOMICAL COMPUTATION (0ms Real Functionality on Click)
+  const city = PAK_CITIES[cityKey];
+  const pktDate = prayerService.getPakistanDate();
+  prayerService.currentCityKey = cityKey;
+  prayerService.currentTimings = prayerService.calculateOfflineTimings(city, appState.selectedSchool, pktDate, cityKey);
+  prayerService.calculateExtraTimes();
+  updatePrayerUI();
+
+  // 2. LIVE SERVER CONNECTION: Fetch live server timings and update status badge
+  try {
+    const res = await prayerService.fetchTimings(cityKey, appState.selectedSchool, false);
+    if (res && res.timings) {
+      updatePrayerUI();
+    }
+  } catch (serverErr) {
+    console.warn('Server live sync notice:', serverErr);
+  }
+}
+
+// Global exposure for instant click response
+window._realOnCityDropdownChange = onCityDropdownChange;
+window.onCityDropdownChange = onCityDropdownChange;
+
+function updateActiveCityButtons(cityKey) {
+  const allCityBtns = document.querySelectorAll('[data-city]');
+  allCityBtns.forEach(btn => {
+    const isThis = btn.getAttribute('data-city') === cityKey;
+    if (isThis) {
+      btn.className = 'btn btn-sm btn-gold';
+      btn.style.boxShadow = '0 0 12px rgba(212,175,55,0.7)';
+      btn.style.transform = 'scale(1.05)';
+    } else {
+      btn.className = 'btn btn-sm btn-outline-gold';
+      btn.style.boxShadow = 'none';
+      btn.style.transform = 'scale(1)';
+    }
+  });
 }
 
 function updateProminentCityDisplay(cityKey) {
@@ -569,11 +622,11 @@ function renderCurrentEventBanner(eventState) {
   `;
 }
 
-// Helper: Generate Five Obligatory Prayer Cards HTML
+// Helper: Generate Five Obligatory Prayer Cards + Tahajjud Card HTML
 function getFivePrayerCardsHtml(eventState) {
   if (!eventState || !eventState.fivePrayers) return '';
 
-  return eventState.fivePrayers.map(p => {
+  const fardHtml = eventState.fivePrayers.map(p => {
     const highlightClass = p.isNext ? 'next-highlight' : '';
 
     return `
@@ -598,6 +651,42 @@ function getFivePrayerCardsHtml(eventState) {
       </a>
     `;
   }).join('');
+
+  // 6th Card: نمازِ تہجد (صلاۃ اللیل) مع لائیو کاؤنٹ ڈاؤن
+  const th = eventState.tahajjud || {};
+  const isNight = th.isNightWindow;
+  const isTahajjudCurrent = th.isLastThirdActive;
+  const isTahajjudNext = isNight && !th.isLastThirdActive;
+  const tahajjudTime12 = th.lastThirdStartTime12 || '--:--';
+  const tahajjudTimeUrdu = th.lastThirdStartTimeUrdu || '--:--';
+  const tahajjudCountdown = th.activeCountdownFormatted || th.countdownToLastThird || '00 : 00 : 00';
+  const tahajjudCountdownLabel = th.activeCountdownLabel || 'تہجد کے وقت میں باقی:';
+
+  const tahajjudCardHtml = `
+    <a href="#view-tahajjud" class="prayer-fard-card prayer-tahajjud-card ${isTahajjudNext ? 'next-highlight' : ''}" style="border:1.5px solid var(--gold-400); background:linear-gradient(180deg, #ffffff 0%, #fefce8 100%);">
+      <div class="prayer-fard-icon">🌙</div>
+      <div class="prayer-fard-name" style="color:var(--emerald-950);">نمازِ تہجد</div>
+      <div class="prayer-fard-time" style="color:#854d0e;">${tahajjudTime12}</div>
+      <div class="prayer-fard-time-urdu">افضل: ${tahajjudTimeUrdu} (عشاء تا فجر)</div>
+      
+      <!-- Live Digital Countdown Box on Tahajjud Card -->
+      <div class="prayer-card-countdown-box" style="background:#022c22; border-color:var(--gold-400);">
+        <div class="prayer-card-countdown-label">${tahajjudCountdownLabel}</div>
+        <div class="prayer-card-countdown-digits">${tahajjudCountdown}</div>
+      </div>
+
+      <div style="font-size:0.82rem; color:var(--emerald-800); font-weight:600; margin-bottom:8px;">
+        ۲ تا ۱۲ رکعات (قیام اللیل)
+      </div>
+      <div>
+        <span class="prayer-fard-status ${isTahajjudCurrent ? 'status-current' : (isTahajjudNext ? 'status-upcoming' : 'status-passed')}">
+          ${th.badgeText || (isNight ? 'جائز وقت جاری ہے' : 'عشاء کے بعد')}
+        </span>
+      </div>
+    </a>
+  `;
+
+  return fardHtml + tahajjudCardHtml;
 }
 
 // Render Five Obligatory Prayer Cards
@@ -814,18 +903,19 @@ function getQuickPunjabCitiesHtml(activeCityKey) {
   const btns = punjabCities.map(c => {
     const isSelected = activeCityKey === c.key;
     const btnCls = isSelected ? 'btn-gold' : 'btn-outline-gold';
-    return `<button type="button" class="btn btn-sm ${btnCls}" onclick="onCityDropdownChange('${c.key}')">${c.name}</button>`;
+    const activeStyle = isSelected ? 'style="box-shadow:0 0 12px rgba(212,175,55,0.7); transform:scale(1.05);"' : '';
+    return `<button type="button" class="btn btn-sm ${btnCls}" data-city="${c.key}" ${activeStyle} onclick="onCityDropdownChange('${c.key}')">${c.name}</button>`;
   }).join(' ');
 
   return `
-    <div style="background:var(--ivory-50); border:1.5px solid var(--gold-400); border-radius:14px; padding:18px 20px; text-align:center; margin-bottom:28px;">
+    <div id="punjab-quick-cities-panel" style="background:var(--ivory-50); border:1.5px solid var(--gold-400); border-radius:14px; padding:18px 20px; text-align:center; margin-bottom:28px;">
       <div style="font-weight:700; color:var(--emerald-950); font-size:1.05rem; margin-bottom:6px;">
         📍 پنجاب کے شہر (براہِ راست وقت تبدیل کرنے کے لیے اپنے شہر پر کلک کریں):
       </div>
       <div style="font-size:0.88rem; color:var(--text-muted); margin-bottom:12px;">
-        کسی بھی شہر پر کلک کریں، تمام نمازوں کے اوقات اور لائیو کاؤنٹ ڈاؤن فوری تبدیل ہو جائیں گے:
+        کسی بھی شہر پر کلک کریں، تمام نمازوں و تہجد کے اوقات اور لائیو کاؤنٹ ڈاؤن فوری تبدیل ہو جائیں گے:
       </div>
-      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px;">
+      <div id="home-punjab-cities-btns" style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px;">
         ${btns}
       </div>
     </div>
@@ -926,7 +1016,7 @@ function renderQuickBarPills(timings, eventState) {
   `).join('');
 }
 
-// Render Home Live Widget with ONLY ONE Live Hourglass ⏳ Countdown, 12-Hour AM/PM, Chasht, Awwabin, and Tahajjud
+// Render Home Live Widget with Persistent Stable Buttons & Smooth Countdown Updates
 function renderHomeLiveWidget(timings, eventState) {
   const container = document.getElementById('home-live-countdown-container');
   if (!container) return;
@@ -961,6 +1051,7 @@ function renderHomeLiveWidget(timings, eventState) {
   const th = eventState.tahajjud || {};
   const isNight = th.isNightWindow;
   const tahajjudTime = (timings && timings.timings12 && timings.timings12.Tahajjud) || th.lastThirdTime12 || '01:15 AM';
+  const tahajjudUrdu = (timings && timings.timingsUrdu && timings.timingsUrdu.Tahajjud) || th.lastThirdStartTimeUrdu || 'رات ۱:۱۵ بجے';
 
   if (isNight && !th.isLastThirdActive) {
     targetNextName = 'نمازِ تہجد';
@@ -972,57 +1063,106 @@ function renderHomeLiveWidget(timings, eventState) {
     targetNextClock = nextNafl.countdownFormatted;
   }
 
-  // Hero Status Banner: ONLY ONE countdown on the Home page (User Requested: "عشاء کا وقت جاری ہے | اگلی نماز [نمازِ تہجد] میں اتنا وقت باقی ہے")
+  // Server status badge text
+  const serverStatusBadge = timings.status === 'server_api'
+    ? `🟢 سرور سے براہِ راست منسلک (Rah e Deen Server PKT: ${timings.serverTimePKT || timings.lastUpdated})`
+    : `🟢 سرور سے خودکار منسلک لائیو اوقات (${cityName})`;
+
+  // Hero Status Banner HTML
   const heroBannerHtml = `
     <div class="card card-crest live-status-hero-banner" style="background:linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%); color:#ffffff; padding:24px 20px; border-radius:16px; border:2px solid var(--gold-400); margin-bottom:24px; text-align:center; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
       <!-- Live Pulse Dot & Current Prayer Status -->
-      <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.2); padding:6px 20px; border-radius:30px; border:1px solid var(--gold-400); margin-bottom:12px;">
+      <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.2); padding:6px 20px; border-radius:30px; border:1px solid var(--gold-400); margin-bottom:10px;">
         <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#22c55e; box-shadow:0 0 10px #22c55e;"></span>
         <strong style="color:var(--gold-300); font-size:1.15rem;">${currentStatusText}</strong>
       </div>
 
-      <!-- Prominent Urdu Heading: اگلی نماز میں اتنا وقت باقی ہے -->
-      <h3 style="font-size:1.55rem; color:#ffffff; margin:8px 0 12px; font-weight:700;">
+      <!-- Prominent Tahajjud Prayer Timing Mention -->
+      <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(212,175,55,0.45); border-radius:12px; padding:8px 16px; display:inline-flex; align-items:center; gap:10px; margin:0 auto 12px; flex-wrap:wrap; justify-content:center;">
+        <span style="color:var(--gold-300); font-weight:700; font-size:0.96rem;">🌙 نمازِ تہجد کا وقت برائے ${cityName}:</span>
+        <span style="font-family:'Plus Jakarta Sans', monospace; font-size:1.25rem; font-weight:800; color:#fde047; direction:ltr;">${tahajjudTime}</span>
+        <span style="color:var(--ivory-200); font-size:0.86rem;">(${tahajjudUrdu} — عشاء کے بعد تا فجر)</span>
+      </div>
+
+      <!-- Prominent Next Prayer Heading -->
+      <h3 style="font-size:1.55rem; color:#ffffff; margin:6px 0 10px; font-weight:700;">
         اگلی نماز <span style="color:var(--gold-300); text-decoration:underline; text-underline-offset:6px;">[${targetNextName}]</span> میں اتنا وقت باقی ہے:
       </h3>
 
-      <!-- Digital Countdown Clock with ⏳ (THE ONLY COUNTDOWN ON HOME PAGE) -->
+      <!-- Digital Countdown Clock with ⏳ (THE ONLY LIVE COUNTDOWN ON HOME HERO) -->
       <div style="font-family:'Plus Jakarta Sans', monospace; font-size:2.5rem; font-weight:800; color:var(--gold-300); letter-spacing:3px; direction:ltr; display:inline-block; background:rgba(0,0,0,0.5); padding:10px 28px; border-radius:12px; border:2px solid rgba(212,175,55,0.6); box-shadow:inset 0 2px 8px rgba(0,0,0,0.4); margin-bottom:10px;">
         ⏳ ${targetNextClock}
       </div>
 
-      <div style="font-size:0.95rem; color:var(--ivory-200); margin-top:6px;">
-        (گھنٹے : منٹ : سیکنڈ — سیکنڈ بہ سیکنڈ لائیو کاؤنٹ ڈاؤن | وقت: <strong style="color:var(--gold-300);">${targetNextTime}</strong> | شہر: <strong style="color:var(--gold-300);">${cityName}</strong>)
+      <div style="font-size:0.95rem; color:var(--ivory-200); margin-top:4px;">
+        (گھنٹے : منٹ : سیکنڈ — سیکنڈ بہ سیکنڈ لائیو کاؤنٹ ڈاؤن | وقت: <strong style="color:var(--gold-300);">${targetNextTime}</strong> | منتخب شہر: <strong style="color:var(--gold-300);">${cityName}</strong>)
+      </div>
+
+      <!-- Live Server Connection Indicator Badge -->
+      <div style="margin-top:10px;">
+        <span style="display:inline-flex; align-items:center; gap:8px; background:rgba(0,0,0,0.35); padding:4px 16px; border-radius:20px; border:1px solid rgba(212,175,55,0.35); font-size:0.82rem; color:var(--gold-300);">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 6px #22c55e;"></span>
+          <span id="server-live-status-text">${serverStatusBadge}</span>
+        </span>
       </div>
     </div>
   `;
 
-  const quickCitiesHtml = getQuickPunjabCitiesHtml(appState.selectedCity);
+  // Persistent sub-containers
+  let heroWrap = document.getElementById('home-hero-wrap');
+  let citiesWrap = document.getElementById('home-cities-wrap');
+  let prayersWrap = document.getElementById('home-prayers-wrap');
+  let tahajjudWrap = document.getElementById('home-tahajjud-wrap');
+  let sequenceWrap = document.getElementById('home-sequence-wrap');
+
+  if (!heroWrap || !citiesWrap || !prayersWrap || !tahajjudWrap || !sequenceWrap) {
+    container.innerHTML = `
+      <div id="home-hero-wrap"></div>
+      <div id="home-cities-wrap"></div>
+      <div id="home-prayers-wrap"></div>
+      <div id="home-tahajjud-wrap"></div>
+      <div id="home-sequence-wrap"></div>
+    `;
+    heroWrap = document.getElementById('home-hero-wrap');
+    citiesWrap = document.getElementById('home-cities-wrap');
+    prayersWrap = document.getElementById('home-prayers-wrap');
+    tahajjudWrap = document.getElementById('home-tahajjud-wrap');
+    sequenceWrap = document.getElementById('home-sequence-wrap');
+
+    // Render cities buttons ONCE so DOM nodes remain stable for clicks
+    citiesWrap.innerHTML = getQuickPunjabCitiesHtml(appState.selectedCity);
+  }
+
+  // Smoothly update Hero Banner
+  heroWrap.innerHTML = heroBannerHtml;
+
+  // Update active city highlight on buttons without re-creating them
+  updateActiveCityButtons(appState.selectedCity);
+
+  // Update Prayers Section (including Tahajjud card)
   const fivePrayersHtml = getFivePrayerCardsHtml(eventState);
-  const tahajjudPanelHtml = getTahajjudNightPanelHtml(eventState, timings);
-  const allSequenceHtml = getAllSequencePrayersHtml(eventState);
-
-  container.innerHTML = `
-    ${heroBannerHtml}
-
-    ${quickCitiesHtml}
-
-    <!-- Five Obligatory Prayers Section on Home Page -->
+  prayersWrap.innerHTML = `
     <div class="section-header" style="margin-bottom:16px; text-align:center;">
-      <span class="section-badge">پانچ فرض نمازیں</span>
-      <h3 class="section-title">آج کی فرض نمازوں کے اوقات برائے ${cityName}</h3>
-      <p style="font-size:0.92rem; color:var(--text-muted);">ہر نماز کا وقت، رکعات اور موجودہ صورتحال ملاحظہ فرمائیں۔</p>
+      <span class="section-badge">پانچ فرض نمازیں و نمازِ تہجد</span>
+      <h3 class="section-title">آج کے اوقاتِ نماز و تہجد مع لائیو کاؤنٹ ڈاؤن برائے ${cityName}</h3>
+      <p style="font-size:0.92rem; color:var(--text-muted);">ہر نماز کا وقت، رکعات اور موجودہ صورتحال سیکنڈ بہ سیکنڈ ملاحظہ فرمائیں۔</p>
     </div>
     <div class="five-prayers-grid" style="margin-bottom:28px;">
       ${fivePrayersHtml}
     </div>
+  `;
 
-    <!-- Dedicated Isha & Tahajjud Night Sequence Panel on Home Page -->
+  // Update Tahajjud Night Panel
+  const tahajjudPanelHtml = getTahajjudNightPanelHtml(eventState, timings);
+  tahajjudWrap.innerHTML = `
     <div class="tahajjud-night-panel" style="margin-bottom:28px;">
       ${tahajjudPanelHtml}
     </div>
+  `;
 
-    <!-- Complete 12 Prayers & Sacred Timings Sequence on Home Page -->
+  // Update 12 Sequence Grid
+  const allSequenceHtml = getAllSequencePrayersHtml(eventState);
+  sequenceWrap.innerHTML = `
     <div class="section-header" style="margin-top:20px; margin-bottom:16px; text-align:center;">
       <span class="section-badge">یومیہ تقویم و ترتیبِ عبادات</span>
       <h3 class="section-title">تمام ۱۲ فرائض و نوافل بلحاظِ ترتیب مع اوقات (اشراق، چاشت، زوال، اوابین، تہجد)</h3>

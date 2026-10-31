@@ -214,7 +214,7 @@ class PrayerTimeEngine {
       const url = `https://api.aladhan.com/v1/timings/${pktDate.dateStrDDMMYYYY}?latitude=${city.lat}&longitude=${city.lng}&method=1&school=${this.currentSchool}&timezonestring=Asia/Karachi${cacheBust}`;
       
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       const response = await fetch(url, { signal: controller.signal });
       clearTimeout(timeoutId);

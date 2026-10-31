@@ -142,8 +142,8 @@
   </style>
 
   <!-- External Stylesheets (Enhanced) -->
-  <link rel="stylesheet" href="/css/style.css?v=3.2">
-  <link rel="stylesheet" href="/css/patterns.css?v=3.2">
+  <link rel="stylesheet" href="/css/style.css?v=3.3">
+  <link rel="stylesheet" href="/css/patterns.css?v=3.3">
 
   <!-- Instant Vanilla Router & Cache Cleaner (Guarantees Instant Navigation & Zero Stale City) -->
   <script>
@@ -153,6 +153,19 @@
         localStorage.removeItem('rahedeen_school');
       }
     } catch (e) {}
+
+    // Global instant city selector fallback (guarantees every button is clickable immediately)
+    window.onCityDropdownChange = function(cityKey) {
+      if (window._realOnCityDropdownChange) {
+        window._realOnCityDropdownChange(cityKey);
+      } else {
+        window._pendingCityKey = cityKey;
+        try {
+          localStorage.setItem('rahedeen_city', cityKey);
+          localStorage.setItem('rahedeen_city_explicit', 'true');
+        } catch(e) {}
+      }
+    };
 
     // Instant View Routing (active immediately)
     function switchActivePageView(targetId) {
@@ -312,23 +325,23 @@
           </p>
 
           <!-- Clickable Punjab City Buttons -->
-          <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:18px;">
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('lahore')">لاہور (Lahore)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('faisalabad')">فیصل آباد (Faisalabad)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rawalpindi')">راولپنڈی (Rawalpindi)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('multan')">ملتان (Multan)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('gujranwala')">گوجرانوالہ (Gujranwala)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sialkot')">سیالکوٹ (Sialkot)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sargodha')">سرگودھا (Sargodha)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('bahawalpur')">بہاولپور (Bahawalpur)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('dera_ghazi_khan')">ڈیرہ غازی خان (D.G. Khan)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sahiwal')">ساہیوال (Sahiwal)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rahim_yar_khan')">رحیم یار خان (R.Y. Khan)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('kasur')">قصور (Kasur)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('jhang')">جھنگ (Jhang)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sheikhupura')">شیخوپورہ (Sheikhupura)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('vehari')">وہاڑی (Vehari)</button>
-            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('chishtian')">چشتیاں (Chishtian)</button>
+          <div id="home-punjab-cities-btns-initial" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:18px;">
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="lahore" onclick="onCityDropdownChange('lahore')">لاہور (Lahore)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="faisalabad" onclick="onCityDropdownChange('faisalabad')">فیصل آباد (Faisalabad)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="rawalpindi" onclick="onCityDropdownChange('rawalpindi')">راولپنڈی (Rawalpindi)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="multan" onclick="onCityDropdownChange('multan')">ملتان (Multan)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="gujranwala" onclick="onCityDropdownChange('gujranwala')">گوجرانوالہ (Gujranwala)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="sialkot" onclick="onCityDropdownChange('sialkot')">سیالکوٹ (Sialkot)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="sargodha" onclick="onCityDropdownChange('sargodha')">سرگودھا (Sargodha)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="bahawalpur" onclick="onCityDropdownChange('bahawalpur')">بہاولپور (Bahawalpur)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="dera_ghazi_khan" onclick="onCityDropdownChange('dera_ghazi_khan')">ڈیرہ غازی خان (D.G. Khan)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="sahiwal" onclick="onCityDropdownChange('sahiwal')">ساہیوال (Sahiwal)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="rahim_yar_khan" onclick="onCityDropdownChange('rahim_yar_khan')">رحیم یار خان (R.Y. Khan)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="kasur" onclick="onCityDropdownChange('kasur')">قصور (Kasur)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="jhang" onclick="onCityDropdownChange('jhang')">جھنگ (Jhang)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="sheikhupura" onclick="onCityDropdownChange('sheikhupura')">شیخوپورہ (Sheikhupura)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="vehari" onclick="onCityDropdownChange('vehari')">وہاڑی (Vehari)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" data-city="chishtian" onclick="onCityDropdownChange('chishtian')">چشتیاں (Chishtian)</button>
           </div>
 
           <div style="margin-top:14px; font-size:0.95rem; color:var(--gold-600); font-weight:700;">
@@ -1180,13 +1193,13 @@
   </footer>
 
   <!-- Scripts: Engine, Data & Master App Controller -->
-  <script src="/js/prayer-times.js?v=3.2"></script>
-  <script src="/js/prayer-guide-data.js?v=3.2"></script>
-  <script src="/js/categories-data.js?v=3.2"></script>
-  <script src="/js/hadith-data.js?v=3.2"></script>
-  <script src="/js/quran-data.js?v=3.2"></script>
-  <script src="/js/calendar-data.js?v=3.2"></script>
-  <script src="/js/duas-data.js?v=3.2"></script>
-  <script src="/js/app.js?v=3.2"></script>
+  <script src="/js/prayer-times.js?v=3.3"></script>
+  <script src="/js/prayer-guide-data.js?v=3.3"></script>
+  <script src="/js/categories-data.js?v=3.3"></script>
+  <script src="/js/hadith-data.js?v=3.3"></script>
+  <script src="/js/quran-data.js?v=3.3"></script>
+  <script src="/js/calendar-data.js?v=3.3"></script>
+  <script src="/js/duas-data.js?v=3.3"></script>
+  <script src="/js/app.js?v=3.3"></script>
 </body>
 </html>
