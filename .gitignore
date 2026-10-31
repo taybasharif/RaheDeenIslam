@@ -1,3 +1,12 @@
+# Local Testing & Development (Laptop only, not needed on static production)
+server.js
+test.js
+package.json
+package-lock.json
+data/
+blogger/
+vercel.json
+
 # Dependencies
 node_modules/
 npm-debug.log*
