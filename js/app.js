@@ -502,36 +502,8 @@ function renderNoCitySelectedState() {
     `;
   }
 
-  // Home live widget
-  const homeWidget = document.getElementById('home-live-countdown-container');
-  if (homeWidget) {
-    homeWidget.innerHTML = `
-      <div class="dual-indicators-container" style="margin-bottom:28px;">
-        <div class="indicator-card">
-          <span class="indicator-badge">📍 اگلی فرض نماز</span>
-          <div class="indicator-title">شہر منتخب کریں</div>
-          <div class="indicator-clock">-- : -- : --</div>
-          <div class="indicator-subtext">نماز کے اوقات کے لیے شہر کا انتخاب کریں</div>
-          <div style="margin-top:14px;">
-            <a href="#prayer-times" class="btn btn-sm btn-gold" data-route="prayer-times">
-              شہر منتخب کریں اور اوقات دیکھیں ←
-            </a>
-          </div>
-        </div>
-        <div class="indicator-card nafl-indicator">
-          <span class="indicator-badge">اگلا اہم وقت / نفل نماز</span>
-          <div class="indicator-title">شہر منتخب کریں</div>
-          <div class="indicator-clock">-- : -- : --</div>
-          <div class="indicator-subtext">یومیہ تقویمِ عبادات</div>
-          <div style="margin-top:14px;">
-            <a href="#prayer-times" class="btn btn-sm btn-outline-gold" data-route="prayer-times">
-              یومیہ تقویمِ عبادات دیکھیں ←
-            </a>
-          </div>
-        </div>
-      </div>
-    `;
-  }
+  // Home live widget: render complete Punjab cities selector prompt & buttons
+  renderHomeNoCityState();
 
   // Timeline table
   const tbody = document.getElementById('daily-timeline-tbody');

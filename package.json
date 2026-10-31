@@ -2,9 +2,9 @@
   "name": "rahedeenislam",
   "version": "1.0.0",
   "description": "Rah e Deen Islam - Islamic Web Portal",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node test.js"
   },
   "keywords": [
     "islam",

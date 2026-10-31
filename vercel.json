@@ -1,13 +1,14 @@
 {
-  "functions": {
-    "server.js": {
-      "includeFiles": "**"
-    }
-  },
+  "version": 2,
+  "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/api/subscribe",
+      "destination": "/api/subscribe.js"
+    },
+    {
+      "source": "/api/prayer-times",
+      "destination": "/api/prayer-times.js"
     }
   ]
 }

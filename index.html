@@ -22,8 +22,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="./css/style.css?v=2.4">
-  <link rel="stylesheet" href="./css/patterns.css?v=2.4">
+  <link rel="stylesheet" href="./css/style.css?v=2.5">
+  <link rel="stylesheet" href="./css/patterns.css?v=2.5">
+  <!-- Strictly prevent Abbottabad or any stale cached city from showing on initial load -->
+  <script>
+    try {
+      if (localStorage.getItem('rahedeen_city') === 'abbottabad' || !localStorage.getItem('rahedeen_city_explicit')) {
+        localStorage.removeItem('rahedeen_city');
+        localStorage.removeItem('rahedeen_school');
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body class="bg-islamic-lattice">
 
@@ -1028,13 +1037,13 @@
   </footer>
 
   <!-- Scripts: Engine, Data & Master App Controller -->
-  <script src="./js/prayer-times.js?v=2.4"></script>
-  <script src="./js/prayer-guide-data.js?v=2.4"></script>
+  <script src="./js/prayer-times.js?v=2.5"></script>
+  <script src="./js/prayer-guide-data.js?v=2.5"></script>
   <script src="./js/categories-data.js"></script>
   <script src="./js/hadith-data.js"></script>
   <script src="./js/quran-data.js"></script>
   <script src="./js/calendar-data.js"></script>
   <script src="./js/duas-data.js"></script>
-  <script src="./js/app.js?v=2.4"></script>
+  <script src="./js/app.js?v=2.5"></script>
 </body>
 </html>
