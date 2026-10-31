@@ -1,14 +1,12 @@
-# Local Testing & Development (Laptop only, not needed on static production)
-server.js
+# Local Testing & Scratch
 test.js
-package.json
-package-lock.json
 data/
 blogger/
-vercel.json
+scratch/
 
 # Dependencies
 node_modules/
+package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

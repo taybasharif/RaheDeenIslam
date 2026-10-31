@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "server.js": {
+      "includeFiles": "**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
+}

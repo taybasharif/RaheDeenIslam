@@ -1,0 +1,17 @@
+{
+  "name": "rahedeenislam",
+  "version": "1.0.0",
+  "description": "Rah e Deen Islam - Islamic Web Portal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "islam",
+    "quran",
+    "hadith",
+    "prayer-times"
+  ],
+  "author": "Tayba Sharif",
+  "license": "ISC"
+}
