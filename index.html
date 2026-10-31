@@ -22,8 +22,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="./css/style.css?v=2.2">
-  <link rel="stylesheet" href="./css/patterns.css?v=2.2">
+  <link rel="stylesheet" href="./css/style.css?v=2.3">
+  <link rel="stylesheet" href="./css/patterns.css?v=2.3">
 </head>
 <body class="bg-islamic-lattice">
 
@@ -408,6 +408,19 @@
 
       <div class="five-prayers-grid" id="five-prayers-container">
         <!-- Rendered dynamically via JS every second with HH : MM : SS digital clocks -->
+      </div>
+
+      <!-- ALL 12 PRAYERS & SACRED TIMINGS IN CHRONOLOGICAL SEQUENCE (WITH LIVE COUNTDOWNS) -->
+      <div class="section-header" style="margin-top:36px; margin-bottom:16px;">
+        <span class="section-badge">یومیہ تقویم و ترتیبِ عبادات</span>
+        <h3 class="section-title">تمام ۱۲ فرائض و نوافل بلحاظِ ترتیب مع لائیو کاؤنٹ ڈاؤن</h3>
+        <p class="section-desc">
+          پاکستان ٹائم زون (UTC+5) کے مطابق فجر، طلوعِ آفتاب، اشراق، چاشت، وقتِ زوال، ظہر، عصر، مغرب، اوابین، عشاء، رات کا زوال اور تہجد کی مکمل ترتیب۔
+        </p>
+      </div>
+
+      <div class="all-sequence-grid" id="all-sequence-prayers-container">
+        <!-- Rendered dynamically via JS every second with HH : MM : SS digital countdown on every card -->
       </div>
 
       <!-- DUAL SEPARATE INDICATORS (1. اگلی فرض نماز | 2. اگلا اہم وقت / نفل نماز) -->
@@ -970,13 +983,13 @@
   </footer>
 
   <!-- Scripts: Engine, Data & Master App Controller -->
-  <script src="./js/prayer-times.js?v=2.2"></script>
-  <script src="./js/prayer-guide-data.js?v=2.2"></script>
+  <script src="./js/prayer-times.js?v=2.3"></script>
+  <script src="./js/prayer-guide-data.js?v=2.3"></script>
   <script src="./js/categories-data.js"></script>
   <script src="./js/hadith-data.js"></script>
   <script src="./js/quran-data.js"></script>
   <script src="./js/calendar-data.js"></script>
   <script src="./js/duas-data.js"></script>
-  <script src="./js/app.js?v=2.2"></script>
+  <script src="./js/app.js?v=2.3"></script>
 </body>
 </html>

@@ -169,6 +169,43 @@ class PrayerTimeEngine {
     // Fetch Weather concurrently
     this.fetchWeather(city.lat, city.lng).catch(e => console.warn('Weather fetch notice:', e));
 
+    // 1. Automatic Server Connection for Timing Change
+    if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.protocol.startsWith('http')) {
+      try {
+        const cacheBust = forceRefresh ? '&_t=' + Date.now() : '';
+        const localUrl = `/api/prayer-times?city=${this.currentCityKey}&school=${this.currentSchool}${cacheBust}`;
+        const localCtrl = new AbortController();
+        const localTid = setTimeout(() => localCtrl.abort(), 2500);
+        const localRes = await fetch(localUrl, { signal: localCtrl.signal });
+        clearTimeout(localTid);
+        if (localRes.ok) {
+          const sData = await localRes.json();
+          if (sData && sData.success && sData.timings) {
+            this.currentTimings = {
+              cityKey: this.currentCityKey,
+              city,
+              school: this.currentSchool,
+              schoolLabel: this.currentSchool === 1 ? 'فقہ حنفی (مثلین - دوگنا سایہ)' : 'شافعی / جمہور (مثلِ اول)',
+              methodName: 'جامعہ علوم اسلامیہ علامہ بنوری ٹاؤن، کراچی (سرور لائیو)',
+              status: 'server_api',
+              statusUrdu: 'سرور سے خودکار منسلک لائیو اوقات (Rah e Deen Server)',
+              timeZone: this.timeZone,
+              dateGregorian: `${pktDate.dateFormattedUrdu} (${pktDate.dateStrDDMMYYYY})`,
+              dateHijri: 'تقویمِ پاکستان',
+              lastUpdated: pktDate.timeFormatted,
+              lastSuccessfulUpdate: pktDate.timeFormatted,
+              timings: sData.timings
+            };
+            this.calculateExtraTimes();
+            this.notifyListeners();
+            return { success: true, timings: this.currentTimings, source: 'server' };
+          }
+        }
+      } catch (serverErr) {
+        // Fall through to AlAdhan or Local Astronomical calculation
+      }
+    }
+
     try {
       const cacheBust = forceRefresh ? `&_t=${Date.now()}` : '';
       const url = `https://api.aladhan.com/v1/timings/${pktDate.dateStrDDMMYYYY}?latitude=${city.lat}&longitude=${city.lng}&method=1&school=${this.currentSchool}&timezonestring=Asia/Karachi${cacheBust}`;
@@ -280,6 +317,8 @@ class PrayerTimeEngine {
     t.ZawalStart = formatM(zawalStartM);
     t.ZawalEnd = formatM(zawalEndM);
     t.Awwabin = formatM(awwabinStartM);
+    const nightZawalM = (maghribM + Math.round(nightMinutes / 2)) % 1440;
+    t.NightZawal = formatM(nightZawalM);
     t.Tahajjud = formatM(lastThirdStartM); // Recommended last third
     t.TahajjudStart = t.Isha; // Permissible window starts after Isha
 
@@ -297,6 +336,7 @@ class PrayerTimeEngine {
       Maghrib: this.format12Hour(t.Maghrib),
       Awwabin: this.format12Hour(t.Awwabin),
       Isha: this.format12Hour(t.Isha),
+      NightZawal: this.format12Hour(t.NightZawal),
       Tahajjud: this.format12Hour(t.Tahajjud),
       TahajjudStart: this.format12Hour(t.TahajjudStart)
     };
@@ -313,6 +353,7 @@ class PrayerTimeEngine {
       Maghrib: this.format12HourUrdu(t.Maghrib),
       Awwabin: this.format12HourUrdu(t.Awwabin),
       Isha: this.format12HourUrdu(t.Isha),
+      NightZawal: this.format12HourUrdu(t.NightZawal),
       Tahajjud: this.format12HourUrdu(t.Tahajjud)
     };
 
@@ -328,6 +369,7 @@ class PrayerTimeEngine {
       maghrib: maghribM,
       awwabin: awwabinStartM,
       isha: ishaM,
+      nightZawal: nightZawalM,
       lastThird: lastThirdStartM,
       nightMinutes: nightMinutes
     };
@@ -637,13 +679,30 @@ class PrayerTimeEngine {
       isLastThirdActive,
       statusUrdu: tahajjudStatus,
       badgeText: tahajjudBadge,
-      nightPeriodText: 'عشاء کے بعد سے لے کر فجر تک',
-      lastThirdStartTime12: t12.Tahajjud,
-      fajrTime12: t12.Fajr,
+      nightPeriodText: 'عشاء کے بعد سے لے کر صبحِ صادق (فجر) تک',
+      targetTimeText: t12.Tahajjud || '--:--',
+      targetTimeUrdu: tUrdu.Tahajjud || '--:--',
+      lastThirdStartTime12: t12.Tahajjud || '--:--',
+      lastThirdStartTimeUrdu: tUrdu.Tahajjud || '--:--',
+      nightZawal12: t12.NightZawal || '--:--',
+      nightZawalUrdu: tUrdu.NightZawal || '--:--',
+      ishaTime12: t12.Isha || '--:--',
+      ishaTimeUrdu: tUrdu.Isha || '--:--',
+      fajrTime12: t12.Fajr || '--:--',
+      fajrTimeUrdu: tUrdu.Fajr || '--:--',
       secUntilLastThird,
       secUntilFajr,
       countdownToLastThird: PrayerTimeEngine.formatHMS(secUntilLastThird),
-      countdownToFajr: PrayerTimeEngine.formatHMS(secUntilFajr)
+      countdownToFajr: PrayerTimeEngine.formatHMS(secUntilFajr),
+      activeCountdownFormatted: isNightWindow
+        ? (isLastThirdActive ? PrayerTimeEngine.formatHMS(secUntilFajr) : PrayerTimeEngine.formatHMS(secUntilLastThird))
+        : PrayerTimeEngine.formatHMS(diffSecTo(m.isha)),
+      activeCountdownLabel: isNightWindow
+        ? (isLastThirdActive ? 'تہجد کا وقت ختم ہونے (فجر) میں باقی:' : 'تہجد کے افضل وقت (آخری تہائی) میں باقی:')
+        : 'آج رات تہجد کا وقت شروع ہونے (عشاء) میں باقی:',
+      activeHeading: isNightWindow
+        ? (isLastThirdActive ? 'تہجد کا افضل ترین وقت جاری ہے (نزولِ رحمت)' : 'عشاء کے بعد تہجد کا جائز وقت جاری ہے')
+        : 'نمازِ تہجد کا وقت (عشاء کے بعد شروع ہوگا)'
     };
 
     // -------------------------------------------------------------
@@ -782,6 +841,247 @@ class PrayerTimeEngine {
       }
     ];
 
+    // -------------------------------------------------------------
+    // 5. ALL 12 PRAYERS & SACRED TIMINGS IN STRICT CHRONOLOGICAL SEQUENCE
+    // -------------------------------------------------------------
+    const sequenceDefs = [
+      {
+        id: 'fajr',
+        num: 1,
+        numUrdu: '۱',
+        nameUrdu: 'نمازِ فجر',
+        categoryUrdu: 'فرض نماز',
+        type: 'fard',
+        time12: t12.Fajr || '--:--',
+        timeUrdu: tUrdu.Fajr || '--:--',
+        icon: '🌄',
+        startM: m.fajr,
+        endM: m.sunrise,
+        ruleUrdu: 'صبحِ صادق سے طلوعِ آفتاب تک (۲ سنت + ۲ فرض)'
+      },
+      {
+        id: 'sunrise',
+        num: 2,
+        numUrdu: '۲',
+        nameUrdu: 'طلوعِ آفتاب',
+        categoryUrdu: 'مکروہ وقت',
+        type: 'prohibited',
+        time12: t12.Sunrise || '--:--',
+        timeUrdu: tUrdu.Sunrise || '--:--',
+        icon: '🌅',
+        startM: m.sunrise,
+        endM: m.ishraq,
+        ruleUrdu: 'سورج نکلنے کا وقت، اس وقت اور اگلے ۱۵-۲۰ منٹ تک نماز پڑھنا منع ہے'
+      },
+      {
+        id: 'ishraq',
+        num: 3,
+        numUrdu: '۳',
+        nameUrdu: 'نمازِ اشراق',
+        categoryUrdu: 'مسنون نفل',
+        type: 'nafl',
+        time12: t12.Ishraq || '--:--',
+        timeUrdu: tUrdu.Ishraq || '--:--',
+        icon: '☀️',
+        startM: m.ishraq,
+        endM: m.ishraqEnd,
+        ruleUrdu: 'طلوعِ آفتاب کے ۱۵ تا ۲۰ منٹ بعد (حج و عمرہ کا کامل ثواب)'
+      },
+      {
+        id: 'chasht',
+        num: 4,
+        numUrdu: '۴',
+        nameUrdu: 'نمازِ چاشت (صلاۃ الضحیٰ)',
+        categoryUrdu: 'مسنون نفل',
+        type: 'nafl',
+        time12: t12.Chasht || '--:--',
+        timeUrdu: tUrdu.Chasht || '--:--',
+        icon: '🌤️',
+        startM: m.chasht,
+        endM: m.zawalStart,
+        ruleUrdu: 'دن چڑھے زوال سے قبل، کم از کم ۲ اور زیادہ سے زیادہ ۱۲ رکعات'
+      },
+      {
+        id: 'zawal_day',
+        num: 5,
+        numUrdu: '۵',
+        nameUrdu: 'وقتِ زوال (استواءِ شمس)',
+        categoryUrdu: 'مکروہ وقت',
+        type: 'prohibited',
+        time12: t12.ZawalStart || '--:--',
+        timeUrdu: tUrdu.ZawalStart || '--:--',
+        icon: '☀️',
+        startM: m.zawalStart,
+        endM: m.dhuhr,
+        ruleUrdu: 'نصف النہار کا وقت، سورج ڈھلنے تک نماز و سجدہ مکروہِ تحریمی ہے'
+      },
+      {
+        id: 'dhuhr',
+        num: 6,
+        numUrdu: '۶',
+        nameUrdu: 'نمازِ ظہر',
+        categoryUrdu: 'فرض نماز',
+        type: 'fard',
+        time12: t12.Dhuhr || '--:--',
+        timeUrdu: tUrdu.Dhuhr || '--:--',
+        icon: '☀️',
+        startM: m.dhuhr,
+        endM: m.asr,
+        ruleUrdu: 'زوالِ آفتاب کے بعد سے عصر کے آغاز تک (۴ سنت + ۴ فرض + ۲ سنت + ۲ نفل)'
+      },
+      {
+        id: 'asr',
+        num: 7,
+        numUrdu: '۷',
+        nameUrdu: 'نمازِ عصر (حنفی)',
+        categoryUrdu: 'فرض نماز',
+        type: 'fard',
+        time12: t12.Asr || '--:--',
+        timeUrdu: tUrdu.Asr || '--:--',
+        icon: '🌤️',
+        startM: m.asr,
+        endM: m.maghrib,
+        ruleUrdu: 'سایہ دوگنا (حنفی مثلین) سے غروبِ آفتاب تک (۴ سنت + ۴ فرض)'
+      },
+      {
+        id: 'maghrib',
+        num: 8,
+        numUrdu: '۸',
+        nameUrdu: 'نمازِ مغرب',
+        categoryUrdu: 'فرض نماز',
+        type: 'fard',
+        time12: t12.Maghrib || '--:--',
+        timeUrdu: tUrdu.Maghrib || '--:--',
+        icon: '🌇',
+        startM: m.maghrib,
+        endM: m.isha,
+        ruleUrdu: 'غروبِ آفتاب کے فوراً بعد شفق کے غائب ہونے تک (۳ فرض + ۲ سنت + ۲ نفل)'
+      },
+      {
+        id: 'awwabin',
+        num: 9,
+        numUrdu: '۹',
+        nameUrdu: 'نمازِ اوابین',
+        categoryUrdu: 'مسنون نفل',
+        type: 'nafl',
+        time12: t12.Awwabin || '--:--',
+        timeUrdu: tUrdu.Awwabin || '--:--',
+        icon: '🤲',
+        startM: m.awwabin,
+        endM: m.isha,
+        ruleUrdu: 'مغرب کے بعد ۶ سے ۲۰ رکعات (دو دو رکعت کر کے)'
+      },
+      {
+        id: 'isha',
+        num: 10,
+        numUrdu: '۱۰',
+        nameUrdu: 'نمازِ عشاء',
+        categoryUrdu: 'فرض نماز',
+        type: 'fard',
+        time12: t12.Isha || '--:--',
+        timeUrdu: tUrdu.Isha || '--:--',
+        icon: '🌙',
+        startM: m.isha,
+        endM: m.nightZawal,
+        ruleUrdu: 'شفق کے غائب ہونے سے صبح صادق تک (۴ سنت + ۴ فرض + ۲ سنت + ۲ نفل + ۳ وتر + ۲ نفل)'
+      },
+      {
+        id: 'zawal_night',
+        num: 11,
+        numUrdu: '۱۱',
+        nameUrdu: 'رات کا زوال (نصف اللیل شرعی)',
+        categoryUrdu: 'شرعی وقت',
+        type: 'timing',
+        time12: t12.NightZawal || '--:--',
+        timeUrdu: tUrdu.NightZawal || '--:--',
+        icon: '🌌',
+        startM: m.nightZawal,
+        endM: m.lastThird,
+        ruleUrdu: 'غروب اور فجر کا نصف۔ اس کے بعد عشاء بلا عذر تاخیر کرنا مکروہِ تنزیہی ہے'
+      },
+      {
+        id: 'tahajjud',
+        num: 12,
+        numUrdu: '۱۲',
+        nameUrdu: 'نمازِ تہجد (صلاۃ اللیل)',
+        categoryUrdu: 'افضل ترین نفل',
+        type: 'nafl',
+        time12: t12.Tahajjud || '--:--',
+        timeUrdu: tUrdu.Tahajjud || '--:--',
+        icon: '✨',
+        startM: m.lastThird,
+        endM: (m.lastThird < m.fajr ? m.fajr : m.fajr + 1440),
+        ruleUrdu: 'رات کا آخری تہائی حصہ (تہجد و استغفار کا افضل ترین وقت تا فجر)'
+      }
+    ];
+
+    let nextSeqIndex = -1;
+    let minSeqDiff = Infinity;
+    for (let i = 0; i < sequenceDefs.length; i++) {
+      let diff = sequenceDefs[i].startM - currentMin;
+      if (diff <= 0) diff += 1440;
+      if (diff < minSeqDiff) {
+        minSeqDiff = diff;
+        nextSeqIndex = i;
+      }
+    }
+
+    const allSequenceEvents = sequenceDefs.map((item, idx) => {
+      let isCurrent = false;
+      let isNext = (idx === nextSeqIndex);
+      let isPassed = false;
+      let statusUrdu = 'آنے والا وقت';
+      let countdownLabel = 'شروع ہونے میں:';
+      let remainingSec = 0;
+
+      if (item.startM < item.endM) {
+        if (currentMin >= item.startM && currentMin < item.endM) isCurrent = true;
+      } else {
+        if (currentMin >= item.startM || currentMin < item.endM) isCurrent = true;
+      }
+
+      if (item.id === 'isha' && (currentMin >= m.isha || currentMin < m.fajr)) {
+        isCurrent = true;
+      }
+
+      if (isCurrent) {
+        statusUrdu = 'موجودہ وقت (جاری ہے)';
+        countdownLabel = 'وقت ختم ہونے میں:';
+        let endDiffM = (item.endM > currentMin) ? (item.endM - currentMin) : (item.endM + 1440 - currentMin);
+        if (item.id === 'isha') {
+          endDiffM = (currentMin >= m.isha) ? (m.fajr + 1440 - currentMin) : (m.fajr - currentMin);
+        }
+        remainingSec = Math.max(0, Math.floor(endDiffM * 60));
+      } else if (isNext) {
+        statusUrdu = 'اگلا شرعی وقت';
+        countdownLabel = 'شروع ہونے میں باقی:';
+        remainingSec = Math.max(0, Math.floor(minSeqDiff * 60));
+      } else {
+        let diffM = item.startM - currentMin;
+        if (diffM > 0) {
+          statusUrdu = 'آنے والا وقت';
+          countdownLabel = 'شروع ہونے میں باقی:';
+          remainingSec = Math.max(0, Math.floor(diffM * 60));
+        } else {
+          isPassed = true;
+          statusUrdu = 'وقت گزر چکا ہے';
+          countdownLabel = 'کل کے وقت میں باقی:';
+          remainingSec = Math.max(0, Math.floor((diffM + 1440) * 60));
+        }
+      }
+
+      return {
+        ...item,
+        isCurrent,
+        isNext,
+        isPassed,
+        statusUrdu,
+        countdownLabel,
+        remainingSec,
+        countdownFormatted: PrayerTimeEngine.formatHMS(remainingSec)
+      };
+    });
+
     return {
       fivePrayers,
       currentFard,
@@ -793,7 +1093,8 @@ class PrayerTimeEngine {
       currentEvent,
       nextEventOrNafl,
       tahajjud: tahajjudInfo,
-      naflCards
+      naflCards,
+      allSequenceEvents
     };
   }
 
@@ -913,28 +1214,28 @@ class PrayerTimeEngine {
         num: 10,
         nameUrdu: 'نمازِ عشاء',
         type: 'fard',
-        time12: t12.Isha,
+        time12: t12.Isha || '--:--',
         startM: m.isha,
-        endM: m.fajr + 1440,
+        endM: m.nightZawal,
         desc: 'پانچویں فرض نماز مع ۳ رکعات وتر واجب'
       },
       {
         num: 11,
-        nameUrdu: 'نمازِ تہجد (صلاۃ اللیل)',
-        type: 'nafl',
-        time12: t12.Tahajjud,
-        startM: m.lastThird,
-        endM: (m.lastThird < m.fajr ? m.fajr : m.fajr + 1440),
-        desc: 'رات کا آخری تہائی حصہ (تہجد و استغفار کا افضل ترین وقت)'
+        nameUrdu: 'رات کا زوال (نصف اللیل شرعی)',
+        type: 'prohibited',
+        time12: t12.NightZawal || '--:--',
+        startM: m.nightZawal,
+        endM: m.lastThird,
+        desc: 'مغرب تا صبح صادق کا عین نصف۔ اس کے بعد عشاء مؤخر کرنا مکروہ ہے'
       },
       {
         num: 12,
-        nameUrdu: 'نمازِ فجر (آئندہ کل)',
-        type: 'fard',
-        time12: t12.Fajr,
-        startM: m.fajr + 1440,
-        endM: m.sunrise + 1440,
-        desc: 'اگلی صبح کی نمازِ فجر'
+        nameUrdu: 'نمازِ تہجد (صلاۃ اللیل)',
+        type: 'nafl',
+        time12: t12.Tahajjud || '--:--',
+        startM: m.lastThird,
+        endM: (m.lastThird < m.fajr ? m.fajr : m.fajr + 1440),
+        desc: 'رات کا آخری تہائی حصہ (تہجد و استغفار کا افضل ترین وقت تا فجر)'
       }
     ];
 

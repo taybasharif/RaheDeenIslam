@@ -422,6 +422,16 @@ function renderNoCitySelectedState() {
     `;
   }
 
+  // 12 Sequence Prayers Container Placeholder
+  const allSeqEl = document.getElementById('all-sequence-prayers-container');
+  if (allSeqEl) {
+    allSeqEl.innerHTML = `
+      <div style="grid-column: 1 / -1; background:var(--ivory-50); border:1.5px dashed var(--gold-400); border-radius:12px; padding:24px; text-align:center; color:var(--text-muted);">
+        📍 تمام ۱۲ فرائض و نوافل (فجر، طلوع، اشراق، چاشت، زوال، ظہر، عصر، مغرب، اوابین، عشاء، رات کا زوال اور تہجد) کی ترتیب اور لائیو کاؤنٹ ڈاؤن دیکھنے کے لیے اوپر سے اپنا شہر منتخب فرمائیں۔
+      </div>
+    `;
+  }
+
   // Dual Indicators
   const fardName = document.getElementById('dual-fard-name');
   const fardClock = document.getElementById('dual-fard-clock');
@@ -537,6 +547,9 @@ function updatePrayerUI() {
   // 2. Five Obligatory Prayer Cards (with live countdown on EVERY card)
   renderFivePrayerCards(eventState);
 
+  // 2.5 All 12 Prayers & Sacred Timings Sequence Grid
+  renderAllSequencePrayers(eventState);
+
   // 3. Dual Indicators: (1. اگلی فرض نماز | 2. اگلا اہم وقت / نفل نماز)
   renderDualIndicators(eventState);
 
@@ -641,65 +654,140 @@ function renderDualIndicators(eventState) {
   }
 }
 
-// Render Dedicated Isha & Tahajjud Night Sequence Section
+// Render Dedicated Isha & Tahajjud Night Sequence Section with Explicit Time Mention & Live Countdown
 function renderTahajjudNightPanel(eventState, timings) {
   const container = document.getElementById('tahajjud-night-panel');
   if (!container || !eventState.tahajjud) return;
 
   const th = eventState.tahajjud;
+  const isNight = th.isNightWindow;
+  const ishaTime = (timings && timings.timings12 && timings.timings12.Isha) ? timings.timings12.Isha : (th.ishaTime12 || '--:--');
+  const nightZawal = (timings && timings.timings12 && timings.timings12.NightZawal) ? timings.timings12.NightZawal : (th.nightZawal12 || '--:--');
+  const tahajjudTime = (timings && timings.timings12 && timings.timings12.Tahajjud) ? timings.timings12.Tahajjud : (th.lastThirdStartTime12 || '--:--');
+  const tahajjudUrdu = (timings && timings.timingsUrdu && timings.timingsUrdu.Tahajjud) ? timings.timingsUrdu.Tahajjud : (th.lastThirdStartTimeUrdu || '--:--');
+  const fajrTime = (timings && timings.timings12 && timings.timings12.Fajr) ? timings.timings12.Fajr : (th.fajrTime12 || '--:--');
 
   container.innerHTML = `
     <div class="tahajjud-panel-header">
       <div>
-        <span class="crescent-badge" style="background:rgba(212,175,55,0.2); color:var(--gold-300); border-color:var(--gold-400); margin-bottom:6px;">
-          ${th.badgeText}
+        <span class="crescent-badge" style="background:rgba(212,175,55,0.25); color:var(--gold-300); border-color:var(--gold-400); margin-bottom:8px;">
+          ✨ ${th.badgeText || 'رات کا قیام'}
         </span>
-        <h3 style="font-size:1.75rem; color:#ffffff; margin:4px 0;">
-          ${th.statusUrdu}
+        <h3 style="font-size:1.85rem; color:#ffffff; margin:6px 0;">
+          ${th.activeHeading || th.statusUrdu || 'نمازِ تہجد'}
         </h3>
-        <p class="urdu-text" style="color:var(--ivory-200); font-size:0.95rem; margin:0;">
-          تہجد کا جائز وقت عشاء کی نماز کے بعد سے صبح صادق تک ہے، جبکہ افضل ترین وقت رات کا آخری تہائی حصہ ہے۔
+        <p class="urdu-text" style="color:var(--ivory-200); font-size:1rem; margin:0; line-height:1.6;">
+          تہجد کا وقت عشاء کی نماز کے بعد سے صبح صادق تک ہے۔
+          <strong>افضل ترین وقت رات کا آخری تہائی حصہ ہے جو ٹھیک رات ${tahajjudTime} بجے (${tahajjudUrdu}) شروع ہوتا ہے۔</strong>
         </p>
       </div>
 
-      <div style="text-align:left;">
-        <span style="font-size:0.85rem; color:var(--gold-300);">آخری تہائی کا آغاز:</span>
-        <div style="font-family:var(--font-ui); font-size:1.6rem; font-weight:800; color:var(--gold-400); direction:ltr;">
-          ${th.lastThirdStartTime12}
+      <!-- Explicit Time Mention Pill -->
+      <div style="text-align:center; background:rgba(212,175,55,0.15); border:1.5px solid var(--gold-400); border-radius:12px; padding:12px 20px;">
+        <span style="font-size:0.85rem; color:var(--gold-300); display:block; margin-bottom:2px;">نمازِ تہجد کا افضل وقت (آخری تہائی):</span>
+        <div style="font-family:var(--font-ui); font-size:1.85rem; font-weight:800; color:var(--gold-400); direction:ltr;">
+          ${tahajjudTime}
         </div>
+        <div style="font-size:0.85rem; color:var(--ivory-200); margin-top:2px;">${tahajjudUrdu}</div>
       </div>
     </div>
 
+    <!-- Prominent Hero Live Countdown Clock -->
+    <div class="tahajjud-hero-clock-box">
+      <div class="tahajjud-hero-clock-label">⏱️ ${th.activeCountdownLabel || 'تہجد میں باقی وقت:'}</div>
+      <div class="tahajjud-hero-clock-digits">${th.activeCountdownFormatted || '00 : 00 : 00'}</div>
+      <div style="font-size:0.88rem; color:var(--gold-200); margin-top:4px;">
+        ${isNight ? 'عشاء کے بعد کی شب بیداری اور سحر کے مبارک اوقات (پاکستان ٹائم زون UTC+5)' : 'آج رات عشاء کے بعد تہجد کا وقت شروع ہوگا'}
+      </div>
+    </div>
+
+    <!-- 4-Box Detail Grid -->
     <div class="tahajjud-panel-grid">
-      <!-- Isha Time -->
+      <!-- Box 1: Isha Time -->
       <div class="tahajjud-stat-box">
         <div class="tahajjud-stat-label">نمازِ عشاء کا وقت</div>
-        <div class="tahajjud-stat-value" style="color:var(--gold-300);">${timings.timings12.Isha}</div>
+        <div class="tahajjud-stat-value" style="color:var(--gold-300);">${ishaTime}</div>
         <div style="font-size:0.78rem; color:var(--ivory-300); margin-top:4px;">تہجد کے جائز وقت کا آغاز</div>
       </div>
 
-      <!-- Night Period -->
+      <!-- Box 2: Night Zawal -->
       <div class="tahajjud-stat-box">
-        <div class="tahajjud-stat-label">تہجد کا شرعی دورانیہ</div>
-        <div style="font-size:1.05rem; font-weight:700; color:#ffffff; margin:6px 0;">${th.nightPeriodText}</div>
-        <div style="font-size:0.78rem; color:var(--gold-300);">نیند کے بعد بیداری مسنون ہے</div>
+        <div class="tahajjud-stat-label">رات کا زوال (نصف اللیل شرعی)</div>
+        <div class="tahajjud-stat-value" style="color:#bae6fd;">${nightZawal}</div>
+        <div style="font-size:0.78rem; color:var(--ivory-300); margin-top:4px;">مغرب تا فجر کا عین نصف</div>
       </div>
 
-      <!-- Countdown to Last Third -->
-      <div class="tahajjud-stat-box" style="border-color:var(--gold-400); background:rgba(212,175,55,0.1);">
-        <div class="tahajjud-stat-label">${th.isLastThirdActive ? 'آخری تہائی ختم ہونے میں:' : 'آخری تہائی رات میں باقی:'}</div>
-        <div class="tahajjud-stat-value" style="color:#fde047;">${th.isLastThirdActive ? th.countdownToFajr : th.countdownToLastThird}</div>
-        <div style="font-size:0.78rem; color:var(--gold-200); margin-top:4px;">${th.isLastThirdActive ? 'تہجد کا افضل ترین وقت جاری ہے' : 'رب کے خاص نزولِ رحمت کا وقت'}</div>
+      <!-- Box 3: Tahajjud Peak Start -->
+      <div class="tahajjud-stat-box" style="border-color:var(--gold-400); background:rgba(212,175,55,0.12);">
+        <div class="tahajjud-stat-label">تہجد کا افضل وقت (آخری تہائی)</div>
+        <div class="tahajjud-stat-value" style="color:#fde047;">${tahajjudTime}</div>
+        <div style="font-size:0.78rem; color:var(--gold-200); margin-top:4px;">نزولِ رحمت و قبولیتِ دعا</div>
       </div>
 
-      <!-- Fajr Time & Countdown -->
+      <!-- Box 4: Fajr End -->
       <div class="tahajjud-stat-box">
         <div class="tahajjud-stat-label">فجر کا وقت (تہجد کا اختتام)</div>
-        <div class="tahajjud-stat-value" style="color:var(--gold-300);">${th.fajrTime12}</div>
-        <div style="font-size:0.78rem; color:var(--ivory-300); margin-top:4px;">فجر میں باقی: ${th.countdownToFajr}</div>
+        <div class="tahajjud-stat-value" style="color:var(--gold-300);">${fajrTime}</div>
+        <div style="font-size:0.78rem; color:var(--ivory-300); margin-top:4px;">صبحِ صادق کا آغاز</div>
       </div>
     </div>
   `;
+}
+
+// Render All 12 Prayers & Sacred Timings Sequence Grid (Zero 'undefined' guaranteed)
+function renderAllSequencePrayers(eventState) {
+  const container = document.getElementById('all-sequence-prayers-container');
+  if (!container || !eventState || !Array.isArray(eventState.allSequenceEvents)) return;
+
+  container.innerHTML = eventState.allSequenceEvents.map(ev => {
+    let typeClass = 'badge-gold';
+    let typeStyle = 'background:var(--gold-50); color:var(--gold-700); border:1px solid var(--gold-400);';
+    if (ev.type === 'fard') {
+      typeStyle = 'background:var(--emerald-50); color:var(--emerald-900); border:1px solid var(--emerald-600);';
+    } else if (ev.type === 'prohibited') {
+      typeStyle = 'background:#fef2f2; color:#b91c1c; border:1px solid #ef4444;';
+    } else if (ev.type === 'timing') {
+      typeStyle = 'background:#f0f9ff; color:#0369a1; border:1px solid #38bdf8;';
+    }
+
+    const isCurrentClass = ev.isCurrent ? 'is-current' : '';
+    const isNextClass = ev.isNext ? 'is-next' : '';
+
+    return `
+      <div class="sequence-card ${isCurrentClass} ${isNextClass}">
+        <div class="seq-num-badge">${ev.numUrdu || ev.num}</div>
+        <div>
+          <div class="seq-icon">${ev.icon || '🕌'}</div>
+          <div class="seq-name">${ev.nameUrdu || ''}</div>
+          <div style="margin:4px 0;">
+            <span style="font-size:0.75rem; font-weight:700; padding:2px 10px; border-radius:12px; display:inline-block; ${typeStyle}">
+              ${ev.categoryUrdu || 'شرعی وقت'}
+            </span>
+          </div>
+
+          <div class="seq-time-row">
+            <span class="seq-time-12">${ev.time12 || '--:--'}</span>
+            <span class="seq-time-urdu">(${ev.timeUrdu || '--:--'})</span>
+          </div>
+
+          <!-- Live Digital Countdown Box on Every Sequence Card -->
+          <div class="prayer-card-countdown-box" style="margin:10px 0;">
+            <div class="prayer-card-countdown-label">${ev.countdownLabel || 'باقی وقت:'}</div>
+            <div class="prayer-card-countdown-digits">${ev.countdownFormatted || '00 : 00 : 00'}</div>
+          </div>
+        </div>
+
+        <div>
+          <div style="margin:6px 0;">
+            <span class="prayer-fard-status ${ev.isCurrent ? 'status-current' : (ev.isNext ? 'status-upcoming' : (ev.isPassed ? 'status-passed' : 'status-upcoming'))}">
+              ${ev.statusUrdu || ''}
+            </span>
+          </div>
+          <div class="seq-rule">${ev.ruleUrdu || ''}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 // Render Chronological 12-Event Timeline Table
@@ -767,19 +855,25 @@ function renderNaflCards(eventState) {
   `).join('');
 }
 
-// Render Quick Bar Pills
+// Render Quick Bar Pills (All Key Daily Sequence Events)
 function renderQuickBarPills(timings, eventState) {
   const container = document.getElementById('quick-prayer-pills');
-  if (!container) return;
+  if (!container || !timings || !timings.timings12) return;
 
   const t12 = timings.timings12;
   const list = [
-    { name: 'فجر', time: t12.Fajr },
-    { name: 'اشراق', time: t12.Ishraq },
-    { name: 'ظہر', time: t12.Dhuhr },
-    { name: 'عصر', time: t12.Asr },
-    { name: 'مغرب', time: t12.Maghrib },
-    { name: 'عشاء', time: t12.Isha }
+    { name: 'فجر', time: t12.Fajr || '--:--' },
+    { name: 'طلوع', time: t12.Sunrise || '--:--' },
+    { name: 'اشراق', time: t12.Ishraq || '--:--' },
+    { name: 'چاشت', time: t12.Chasht || '--:--' },
+    { name: 'زوال', time: t12.ZawalStart || '--:--' },
+    { name: 'ظہر', time: t12.Dhuhr || '--:--' },
+    { name: 'عصر', time: t12.Asr || '--:--' },
+    { name: 'مغرب', time: t12.Maghrib || '--:--' },
+    { name: 'اوابین', time: t12.Awwabin || '--:--' },
+    { name: 'عشاء', time: t12.Isha || '--:--' },
+    { name: 'رات زوال', time: t12.NightZawal || '--:--' },
+    { name: 'تہجد', time: t12.Tahajjud || '--:--' }
   ];
 
   container.innerHTML = list.map(item => `
@@ -841,6 +935,9 @@ function startMasterTimer() {
 
     // 2. Five Obligatory Prayer Cards
     renderFivePrayerCards(eventState);
+
+    // 2.5 All 12 Sequence Cards (Live HH:MM:SS on all 12 cards)
+    renderAllSequencePrayers(eventState);
 
     // 3. Dual Indicators
     renderDualIndicators(eventState);

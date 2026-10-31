@@ -63,6 +63,19 @@ function handler(req, res) {
     }
   }
 
+  // API Prayer Times Handler
+  if (urlPath === '/api/prayer-times' || urlPath.startsWith('/api/prayer-times')) {
+    try {
+      const prayerTimesHandler = require('./api/prayer-times');
+      await prayerTimesHandler(req, res);
+      return;
+    } catch (apiErr) {
+      res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ success: false, message: 'Serverless API Error' }));
+      return;
+    }
+  }
+
   // Normalize static root
   if (urlPath === '/' || urlPath === '') {
     urlPath = '/index.html';
