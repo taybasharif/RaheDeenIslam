@@ -11,20 +11,141 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="راہ دین اسلام | Rah e Deen Islam">
   <meta property="og:description" content="قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش — پاکستان کے لائیو اوقاتِ نماز اور مستند دینی رہنمائی">
-  <meta property="og:image" content="assets/logo.svg">
+  <meta property="og:image" content="/assets/logo.svg">
   
   <!-- Favicon / Brand Icon -->
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
   
   <!-- Google Fonts: Amiri (Arabic with diacritics), Noto Nastaliq Urdu, Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="./css/style.css?v=3.1">
-  <link rel="stylesheet" href="./css/patterns.css?v=3.1">
-  <!-- Strictly prevent Abbottabad or any stale cached city from showing on initial load -->
+  <!-- Core Critical Inline CSS: Guarantees 100% Visual Structure, Layout & Cards Even If External CSS Is Delayed -->
+  <style>
+    :root {
+      --emerald-950: #011c15;
+      --emerald-900: #022c22;
+      --emerald-850: #04392c;
+      --emerald-800: #064e3b;
+      --emerald-700: #047857;
+      --emerald-600: #059669;
+      --emerald-100: #d1fae5;
+      --emerald-50:  #ecfdf5;
+      --gold-600: #aa771c;
+      --gold-500: #d4af37;
+      --gold-400: #e5c158;
+      --gold-300: #f3d889;
+      --gold-100: #fef7db;
+      --gold-50:  #fdfcf7;
+      --ivory-50:  #ffffff;
+      --ivory-100: #fcfbf7;
+      --ivory-200: #f7f4ec;
+      --ivory-300: #efe9dc;
+      --text-dark: #1a2421;
+      --text-muted: #4b5e56;
+      --font-urdu: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaliq', 'Alvi Nastaleeq', 'Urdu Typesetting', serif;
+      --font-arabic: 'Amiri', 'Traditional Arabic', 'Scheherazade New', serif;
+      --font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --border-radius-sm: 8px;
+      --border-radius-md: 14px;
+      --border-radius-lg: 20px;
+      --border-radius-xl: 32px;
+      --shadow-sm: 0 2px 6px rgba(2, 44, 34, 0.05);
+      --shadow-md: 0 6px 18px rgba(2, 44, 34, 0.08);
+      --shadow-lg: 0 14px 34px rgba(2, 44, 34, 0.12);
+      --shadow-gold: 0 4px 20px rgba(212, 175, 55, 0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; direction: rtl; }
+    body {
+      font-family: var(--font-urdu);
+      font-size: 1.05rem;
+      line-height: 2.1;
+      color: var(--text-dark);
+      background-color: var(--ivory-100);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .page-view { display: none !important; }
+    .page-view.active { display: block !important; }
+    .site-main { max-width: 1200px; margin: 0 auto; padding: 24px 16px; width: 100%; flex: 1; }
+    .top-bar { background: var(--emerald-950); color: var(--ivory-200); padding: 8px 24px; font-size: 0.88rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212, 175, 55, 0.3); }
+    .top-bar-info { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+    .site-header { background: var(--emerald-900); border-bottom: 2px solid var(--gold-500); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-md); }
+    .header-container { max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .brand-link { display: flex; align-items: center; gap: 14px; text-decoration: none; color: #fff; }
+    .brand-title { font-family: var(--font-urdu); font-size: 1.75rem; font-weight: 700; color: var(--gold-400); margin: 0; }
+    .brand-tagline { font-size: 0.82rem; color: var(--ivory-300); }
+    .nav-list { display: flex; align-items: center; list-style: none; gap: 6px; flex-wrap: wrap; margin: 0; padding: 0; }
+    .nav-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; color: var(--ivory-100); text-decoration: none; font-size: 0.96rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; }
+    .nav-link:hover, .nav-link.active { background: var(--gold-500); color: var(--emerald-950); font-weight: 700; }
+    .hero-banner { background: linear-gradient(180deg, var(--emerald-900) 0%, var(--emerald-850) 60%, var(--emerald-800) 100%); color: #fff; padding: 48px 24px; text-align: center; border-radius: var(--border-radius-lg); margin-bottom: 24px; border: 1.5px solid var(--gold-500); box-shadow: var(--shadow-md); }
+    .bismillah-calligraphy { font-family: var(--font-arabic); font-size: 2.2rem; color: var(--gold-400); margin-bottom: 8px; }
+    .hero-title { font-size: 2.8rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .hero-subtitle { font-size: 1.15rem; color: var(--ivory-200); max-width: 700px; margin: 0 auto 20px; }
+    .hero-btn-group { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; border-radius: 25px; font-weight: 700; font-size: 0.98rem; text-decoration: none; cursor: pointer; transition: all 0.2s ease; border: 1.5px solid transparent; }
+    .btn-gold { background: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-500) 100%); color: var(--emerald-950); border-color: var(--gold-500); box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35); }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(212, 175, 55, 0.45); }
+    .btn-outline-gold { background: transparent; color: var(--gold-400); border-color: var(--gold-400); }
+    .btn-outline-gold:hover { background: rgba(212, 175, 55, 0.15); transform: translateY(-2px); }
+    .btn-sm { padding: 6px 14px; font-size: 0.88rem; border-radius: 18px; }
+    .card { background: #ffffff; border-radius: var(--border-radius-md); padding: 24px; border: 1px solid var(--ivory-300); box-shadow: var(--shadow-sm); margin-bottom: 24px; }
+    .card-crest { border-top: 3px solid var(--gold-500); }
+    .section-badge { display: inline-block; background: rgba(212, 175, 55, 0.15); color: var(--gold-600); border: 1px solid var(--gold-400); padding: 4px 14px; border-radius: 20px; font-size: 0.88rem; font-weight: 700; margin-bottom: 8px; }
+    .five-prayers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 14px; }
+    .prayer-fard-card { background: #ffffff; border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: var(--border-radius-md); padding: 18px; text-align: center; text-decoration: none; color: inherit; display: block; transition: all 0.2s ease; box-shadow: var(--shadow-sm); }
+    .prayer-fard-card:hover, .prayer-fard-card.next-highlight { border-color: var(--gold-500); transform: translateY(-3px); box-shadow: var(--shadow-gold); }
+    .prayer-fard-card.next-highlight { background: linear-gradient(180deg, #ffffff 0%, var(--gold-50) 100%); }
+    .prayer-fard-icon { font-size: 2rem; margin-bottom: 4px; }
+    .prayer-fard-name { font-size: 1.35rem; font-weight: 700; color: var(--emerald-950); }
+    .prayer-fard-time { font-family: var(--font-ui); font-size: 1.6rem; font-weight: 800; color: var(--emerald-800); direction: ltr; margin: 4px 0; }
+    .prayer-fard-time-urdu { font-size: 0.95rem; color: var(--text-muted); }
+    .prayer-card-countdown-box { background: var(--emerald-950); color: var(--gold-300); padding: 8px; border-radius: 10px; margin: 10px 0; border: 1px solid var(--gold-400); }
+    .prayer-card-countdown-label { font-size: 0.78rem; color: var(--ivory-200); }
+    .prayer-card-countdown-digits { font-family: var(--font-ui); font-size: 1.25rem; font-weight: 800; letter-spacing: 1.5px; direction: ltr; }
+    .prayer-fard-status { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; }
+    .status-current { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .status-upcoming { background: #fef9c3; color: #a16207; border: 1px solid #fde047; }
+    .status-passed { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+    .all-sequence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
+    .sequence-card { background: #ffffff; border: 1.5px solid var(--ivory-300); border-radius: var(--border-radius-md); padding: 18px 16px; position: relative; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); }
+    .sequence-card.is-current { border: 2px solid var(--emerald-600); background: linear-gradient(180deg, #ffffff 0%, var(--emerald-50) 100%); }
+    .sequence-card.is-next { border: 2px solid var(--gold-400); background: linear-gradient(180deg, #ffffff 0%, var(--gold-50) 100%); }
+    .seq-num-badge { position: absolute; top: 12px; left: 12px; width: 28px; height: 28px; border-radius: 50%; background: var(--emerald-900); color: var(--gold-300); font-family: var(--font-ui); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+    .seq-icon { font-size: 1.8rem; margin-bottom: 4px; }
+    .seq-name { font-size: 1.25rem; font-weight: 700; color: var(--emerald-950); }
+    .seq-time-row { display: flex; align-items: baseline; gap: 8px; justify-content: center; direction: ltr; margin: 4px 0; }
+    .seq-time-12 { font-family: var(--font-ui); font-size: 1.45rem; font-weight: 800; color: var(--emerald-800); }
+    .seq-time-urdu { font-size: 0.9rem; color: var(--text-muted); direction: rtl; }
+    .seq-rule { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+    .tahajjud-night-panel { background: linear-gradient(135deg, #011c15 0%, #064e3b 60%, #011c15 100%); color: #ffffff; padding: 24px; border-radius: var(--border-radius-lg); border: 2px solid var(--gold-400); box-shadow: var(--shadow-md); text-align: center; }
+    .tahajjud-panel-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; text-align: right; }
+    .tahajjud-panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .tahajjud-stat-box { background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: var(--border-radius-md); padding: 14px 12px; text-align: center; }
+    .tahajjud-stat-label { font-size: 0.82rem; color: var(--ivory-200); margin-bottom: 4px; }
+    .tahajjud-stat-value { font-family: var(--font-ui); font-size: 1.45rem; font-weight: 800; direction: ltr; }
+    .site-footer { background: var(--emerald-950); color: var(--ivory-200); padding: 36px 20px 24px; margin-top: 48px; border-top: 2px solid var(--gold-500); }
+    .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-size: 0.95rem; }
+    .youtube-subscribe-section { background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #450a0a 100%); border: 2px solid var(--gold-400); border-radius: var(--border-radius-lg); padding: 32px 20px; text-align: center; color: #ffffff; margin-bottom: 32px; box-shadow: var(--shadow-md); }
+    .youtube-subscribe-btn { display: inline-flex; align-items: center; gap: 10px; background: #ef4444; color: #ffffff; font-weight: 700; font-size: 1.05rem; padding: 10px 26px; border-radius: 30px; text-decoration: none; box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4); border: 1.5px solid #fca5a5; }
+    @media (max-width: 768px) {
+      .top-bar { flex-direction: column; gap: 6px; text-align: center; }
+      .header-container { flex-direction: column; gap: 12px; text-align: center; }
+      .nav-list { justify-content: center; }
+      .hero-title { font-size: 2.1rem; }
+      .bismillah-calligraphy { font-size: 1.7rem; }
+      .tahajjud-panel-header { text-align: center; justify-content: center; }
+    }
+  </style>
+
+  <!-- External Stylesheets (Enhanced) -->
+  <link rel="stylesheet" href="/css/style.css?v=3.2">
+  <link rel="stylesheet" href="/css/patterns.css?v=3.2">
+
+  <!-- Instant Vanilla Router & Cache Cleaner (Guarantees Instant Navigation & Zero Stale City) -->
   <script>
     try {
       if (localStorage.getItem('rahedeen_city') === 'abbottabad' || !localStorage.getItem('rahedeen_city_explicit')) {
@@ -32,6 +153,39 @@
         localStorage.removeItem('rahedeen_school');
       }
     } catch (e) {}
+
+    // Instant View Routing (active immediately)
+    function switchActivePageView(targetId) {
+      var views = document.querySelectorAll('.page-view');
+      for (var i = 0; i < views.length; i++) {
+        views[i].classList.remove('active');
+        views[i].style.display = 'none';
+      }
+      var target = document.getElementById(targetId);
+      if (target) {
+        target.classList.add('active');
+        target.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    window.addEventListener('hashchange', function() {
+      var hash = (window.location.hash || '').replace('#', '');
+      if (hash) {
+        switchActivePageView('view-' + hash);
+      } else {
+        switchActivePageView('view-home');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var hash = (window.location.hash || '').replace('#', '');
+      if (hash) {
+        switchActivePageView('view-' + hash);
+      } else {
+        switchActivePageView('view-home');
+      }
+    });
   </script>
 </head>
 <body class="bg-islamic-lattice">
@@ -70,7 +224,7 @@
   <header class="site-header">
     <div class="header-container">
       <a href="#home" class="brand-wrapper" data-route="home">
-        <img src="assets/logo.svg" alt="راہ دین اسلام لوگو" class="brand-logo-img">
+        <img src="/assets/logo.svg" alt="راہ دین اسلام لوگو" class="brand-logo-img">
         <div class="brand-text">
           <h1>راہ دین اسلام</h1>
           <p>RAH E DEEN ISLAM</p>
@@ -186,7 +340,7 @@
       <!-- YouTube Official Channel Subscription Section -->
       <div class="youtube-subscribe-section">
         <a href="https://www.youtube.com/@Rah_e_DeenIslam" target="_blank" rel="noopener noreferrer" style="text-decoration:none; display:inline-block; margin-bottom:12px;" title="یوٹیوب آفیشل چینل پر جائیں">
-          <img src="assets/youtube-channel-logo.jpg" alt="Rah e Deen Islam YouTube Channel Logo" style="width:90px; height:90px; border-radius:50%; border:3px solid var(--gold-400); box-shadow:0 6px 18px rgba(0,0,0,0.35); object-fit:cover; display:inline-block; transition:transform 0.3s ease;">
+          <img src="/assets/youtube-channel-logo.jpg" alt="Rah e Deen Islam YouTube Channel Logo" style="width:90px; height:90px; border-radius:50%; border:3px solid var(--gold-400); box-shadow:0 6px 18px rgba(0,0,0,0.35); object-fit:cover; display:inline-block; transition:transform 0.3s ease;">
         </a>
         <h3 style="font-size:1.85rem; font-weight:700; margin-bottom:10px; color:#ffffff;">
           ہمارے یوٹیوب چینل کو سبسکرائب کریں
@@ -816,7 +970,7 @@
 
       <div class="card card-crest" style="max-width:850px; margin:0 auto; padding:36px; background:#ffffff;">
         <div style="text-align:center; margin-bottom:24px;">
-          <img src="assets/logo.svg" alt="راہ دین اسلام" style="width:110px; height:110px;">
+          <img src="/assets/logo.svg" alt="راہ دین اسلام" style="width:110px; height:110px;">
           <h3 class="arabic-text" style="font-size:2.2rem; color:var(--emerald-900); margin-top:12px;">راہ دین اسلام</h3>
           <p class="crescent-badge" style="margin-top:6px; font-size:1rem;">
             قرآن و سنت کی روشنی میں دین اسلام کو پھیلانے کی ایک نیک کوشش
@@ -957,7 +1111,7 @@
     <div class="footer-container">
       <div class="footer-col">
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-          <img src="assets/logo.svg" alt="راہ دین اسلام" style="width:48px; height:48px;">
+          <img src="/assets/logo.svg" alt="راہ دین اسلام" style="width:48px; height:48px;">
           <h4 style="margin:0; font-size:1.4rem;">راہ دین اسلام</h4>
         </div>
         <p style="color:var(--gold-300); font-family:var(--font-ui); font-size:0.88rem; margin-bottom:8px; font-weight:700;">
@@ -1026,13 +1180,13 @@
   </footer>
 
   <!-- Scripts: Engine, Data & Master App Controller -->
-  <script src="./js/prayer-times.js?v=3.1"></script>
-  <script src="./js/prayer-guide-data.js?v=3.1"></script>
-  <script src="./js/categories-data.js"></script>
-  <script src="./js/hadith-data.js"></script>
-  <script src="./js/quran-data.js"></script>
-  <script src="./js/calendar-data.js"></script>
-  <script src="./js/duas-data.js"></script>
-  <script src="./js/app.js?v=3.1"></script>
+  <script src="/js/prayer-times.js?v=3.2"></script>
+  <script src="/js/prayer-guide-data.js?v=3.2"></script>
+  <script src="/js/categories-data.js?v=3.2"></script>
+  <script src="/js/hadith-data.js?v=3.2"></script>
+  <script src="/js/quran-data.js?v=3.2"></script>
+  <script src="/js/calendar-data.js?v=3.2"></script>
+  <script src="/js/duas-data.js?v=3.2"></script>
+  <script src="/js/app.js?v=3.2"></script>
 </body>
 </html>

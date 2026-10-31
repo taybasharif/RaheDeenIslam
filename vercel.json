@@ -1,14 +1,21 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/subscribe",
-      "destination": "/api/subscribe.js"
+      "src": "/api/subscribe",
+      "dest": "/api/subscribe.js"
     },
     {
-      "source": "/api/prayer-times",
-      "destination": "/api/prayer-times.js"
+      "src": "/api/prayer-times",
+      "dest": "/api/prayer-times.js"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }

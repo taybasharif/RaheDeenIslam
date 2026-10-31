@@ -92,7 +92,14 @@ async function handler(req, res) {
 
   fs.stat(resolvedPath, (err, stats) => {
     if (err || !stats.isFile()) {
-      // Fallback for SPA routing to index.html
+      const ext = path.extname(urlPath).toLowerCase();
+      // If a static asset (.css, .js, .svg, .png, etc.) is missing, return 404 with plain text, NEVER index.html!
+      if (ext && ext !== '.html') {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end(`404 Not Found: ${urlPath}`);
+        return;
+      }
+      // Fallback for SPA routing to index.html (only for page navigations)
       const indexPath = path.join(ROOT_DIR, 'index.html');
       fs.readFile(indexPath, (readErr, content) => {
         if (readErr) {
