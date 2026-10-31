@@ -21,7 +21,7 @@
 // Application State
 const appState = {
   currentRoute: 'home',
-  selectedCity: 'vehari',
+  selectedCity: (typeof localStorage !== 'undefined' ? localStorage.getItem('rahedeen_city') : null) || null,
   selectedSchool: 1, // 1 = Hanafi
   hadith: {
     page: 1,
@@ -163,6 +163,17 @@ function initCitySelector() {
   const populateSelect = (selectEl) => {
     if (!selectEl) return;
     selectEl.innerHTML = '';
+
+    // Default placeholder option: "شہر منتخب کریں"
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'شہر منتخب کریں';
+    placeholder.disabled = true;
+    if (!savedCity) {
+      placeholder.selected = true;
+    }
+    selectEl.appendChild(placeholder);
+
     for (const [key, city] of Object.entries(PAK_CITIES)) {
       const option = document.createElement('option');
       option.value = key;
@@ -189,6 +200,15 @@ function filterCityDropdown(query) {
   const cleanQuery = query.trim().toLowerCase();
   mainDropdown.innerHTML = '';
 
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = 'شہر منتخب کریں';
+  placeholder.disabled = true;
+  if (!appState.selectedCity) {
+    placeholder.selected = true;
+  }
+  mainDropdown.appendChild(placeholder);
+
   for (const [key, city] of Object.entries(PAK_CITIES)) {
     const matchUrdu = city.nameUrdu.includes(cleanQuery);
     const matchEn = city.nameEn.toLowerCase().includes(cleanQuery);
@@ -205,8 +225,9 @@ function filterCityDropdown(query) {
 }
 
 async function onCityDropdownChange(cityKey) {
-  if (!PAK_CITIES[cityKey]) return;
+  if (!cityKey || !PAK_CITIES[cityKey]) return;
   appState.selectedCity = cityKey;
+  prayerService.setCity(cityKey);
 
   // Sync both dropdowns
   const quickSelect = document.getElementById('quick-city-select');
@@ -215,12 +236,19 @@ async function onCityDropdownChange(cityKey) {
   if (mainDropdown) mainDropdown.value = cityKey;
 
   updateProminentCityDisplay(cityKey);
-  await loadPrayerData(false);
+  await prayerService.fetchTimings(cityKey, appState.selectedSchool, false);
 }
 
 function updateProminentCityDisplay(cityKey) {
-  const city = PAK_CITIES[cityKey] || PAK_CITIES.vehari;
   const nameEl = document.getElementById('selected-city-name-text');
+  const prefixEl = document.getElementById('prominent-city-prefix');
+  if (!cityKey || !PAK_CITIES[cityKey]) {
+    if (prefixEl) prefixEl.textContent = 'شہر منتخب کریں: ';
+    if (nameEl) nameEl.textContent = 'شہر منتخب کریں';
+    return;
+  }
+  const city = PAK_CITIES[cityKey];
+  if (prefixEl) prefixEl.textContent = 'آپ کا منتخب کردہ شہر: ';
   if (nameEl) {
     nameEl.textContent = `${city.nameUrdu}، پاکستان (${city.province})`;
   }
@@ -310,7 +338,11 @@ function showRefreshToast(msg, type = 'success') {
 async function loadPrayerData(forceRefresh = false) {
   prayerService.addListener(updatePrayerUI);
   prayerService.addWeatherListener(updateWeatherUI);
-  await prayerService.fetchTimings(appState.selectedCity, appState.selectedSchool, forceRefresh);
+  if (appState.selectedCity) {
+    await prayerService.fetchTimings(appState.selectedCity, appState.selectedSchool, forceRefresh);
+  } else {
+    updatePrayerUI();
+  }
 }
 
 function updateWeatherUI(weather) {
@@ -330,10 +362,161 @@ function updateWeatherUI(weather) {
   if (setEl) setEl.textContent = weather.sunset;
 }
 
+// Render clean placeholder UI when no city is selected yet
+function renderNoCitySelectedState() {
+  updateProminentCityDisplay(null);
+
+  // Quick bar pills
+  const pillsEl = document.getElementById('quick-prayer-pills');
+  if (pillsEl) {
+    pillsEl.innerHTML = `
+      <div class="prayer-pill" style="background:rgba(212,175,55,0.15); border-color:var(--gold-400);">
+        <span class="prayer-pill-name">📍 شہر منتخب کریں:</span>
+        <span class="prayer-pill-time">اوقاتِ نماز دیکھنے کے لیے اوپر سے اپنا شہر منتخب فرمائیں</span>
+      </div>
+    `;
+  }
+
+  // Current event banner
+  const bannerEl = document.getElementById('current-event-banner');
+  if (bannerEl) {
+    bannerEl.innerHTML = `
+      <div style="display:flex; align-items:center; gap:12px; width:100%; justify-content:space-between; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.6rem;">🕌</span>
+          <div>
+            <div style="font-size:0.85rem; color:var(--gold-300);">راہ دین اسلام — لائیو اوقاتِ نماز</div>
+            <strong style="font-size:1.15rem; color:#ffffff;">نماز کے درست اوقات اور لائیو کاؤنٹ ڈاؤن کے لیے اپنا شہر منتخب فرمائیں</strong>
+          </div>
+        </div>
+        <div class="nafl-timer-clock-badge" style="background:#022c22; color:var(--gold-300); border-color:var(--gold-400);">
+          شہر منتخب کریں
+        </div>
+      </div>
+    `;
+  }
+
+  // Five prayer cards container: render a friendly card with popular city quick buttons!
+  const fivePrayersEl = document.getElementById('five-prayers-container');
+  if (fivePrayersEl) {
+    fivePrayersEl.innerHTML = `
+      <div style="grid-column: 1 / -1; background:var(--ivory-50); border:2px dashed var(--gold-400); border-radius:16px; padding:32px 24px; text-align:center;">
+        <div style="font-size:3rem; margin-bottom:12px;">📍</div>
+        <h4 style="color:var(--emerald-950); font-size:1.4rem; margin-bottom:8px;">براہِ کرم اوپر سے اپنا شہر منتخب فرمائیں</h4>
+        <p class="urdu-text" style="color:var(--text-muted); font-size:1rem; max-width:650px; margin:0 auto 20px;">
+          پانچوں فرض نمازوں (فجر، ظہر، عصر حنفی، مغرب، عشاء) کے درست فلکیاتی اوقات اور سیکنڈ بہ سیکنڈ لائیو کاؤنٹ ڈاؤن دیکھنے کے لیے فہرست سے اپنا شہر منتخب کریں۔
+        </p>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('vehari')">وہاڑی (Vehari)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('chishtian')">چشتیاں (Chishtian)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('lahore')">لاہور (Lahore)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('karachi')">کراچی (Karachi)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('islamabad')">اسلام آباد (Islamabad)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rawalpindi')">راولپنڈی (Rawalpindi)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('multan')">ملتان (Multan)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('faisalabad')">فیصل آباد (Faisalabad)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('peshawar')">پشاور (Peshawar)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('quetta')">کوئٹہ (Quetta)</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Dual Indicators
+  const fardName = document.getElementById('dual-fard-name');
+  const fardClock = document.getElementById('dual-fard-clock');
+  const fardSub = document.getElementById('dual-fard-subtext');
+  const naflName = document.getElementById('dual-nafl-name');
+  const naflClock = document.getElementById('dual-nafl-clock');
+  const naflSub = document.getElementById('dual-nafl-subtext');
+
+  if (fardName) fardName.textContent = 'شہر منتخب کریں';
+  if (fardClock) fardClock.textContent = '-- : -- : --';
+  if (fardSub) fardSub.textContent = 'براہ کرم اوپر سے اپنا شہر منتخب فرمائیں';
+
+  if (naflName) naflName.textContent = 'شہر منتخب کریں';
+  if (naflClock) naflClock.textContent = '-- : -- : --';
+  if (naflSub) naflSub.textContent = 'براہ کرم اوپر سے اپنا شہر منتخب فرمائیں';
+
+  // Tahajjud panel
+  const tahajjudEl = document.getElementById('tahajjud-night-panel');
+  if (tahajjudEl) {
+    tahajjudEl.innerHTML = `
+      <div style="text-align:center; padding:28px 16px;">
+        <span class="crescent-badge" style="background:rgba(212,175,55,0.2); color:var(--gold-300); border-color:var(--gold-400); margin-bottom:8px;">
+          رات کا قیام و تہجد
+        </span>
+        <h3 style="font-size:1.45rem; color:#ffffff; margin:8px 0;">
+          تہجد کے اوقات اور آخری تہائی کا حساب
+        </h3>
+        <p class="urdu-text" style="color:var(--ivory-200); font-size:0.95rem; max-width:600px; margin:0 auto 16px;">
+          تہجد کا جائز وقت عشاء کے بعد سے فجر تک ہے، جبکہ افضل وقت رات کا آخری تہائی حصہ ہے۔ اپنے شہر کے مطابق درست وقت دیکھنے کے لیے اوپر سے شہر منتخب فرمائیں۔
+        </p>
+      </div>
+    `;
+  }
+
+  // Home live widget
+  const homeWidget = document.getElementById('home-live-countdown-container');
+  if (homeWidget) {
+    homeWidget.innerHTML = `
+      <div class="dual-indicators-container" style="margin-bottom:28px;">
+        <div class="indicator-card">
+          <span class="indicator-badge">📍 اگلی فرض نماز</span>
+          <div class="indicator-title">شہر منتخب کریں</div>
+          <div class="indicator-clock">-- : -- : --</div>
+          <div class="indicator-subtext">نماز کے اوقات کے لیے شہر کا انتخاب کریں</div>
+          <div style="margin-top:14px;">
+            <a href="#prayer-times" class="btn btn-sm btn-gold" data-route="prayer-times">
+              شہر منتخب کریں اور اوقات دیکھیں ←
+            </a>
+          </div>
+        </div>
+        <div class="indicator-card nafl-indicator">
+          <span class="indicator-badge">اگلا اہم وقت / نفل نماز</span>
+          <div class="indicator-title">شہر منتخب کریں</div>
+          <div class="indicator-clock">-- : -- : --</div>
+          <div class="indicator-subtext">یومیہ تقویمِ عبادات</div>
+          <div style="margin-top:14px;">
+            <a href="#prayer-times" class="btn btn-sm btn-outline-gold" data-route="prayer-times">
+              یومیہ تقویمِ عبادات دیکھیں ←
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Timeline table
+  const tbody = document.getElementById('daily-timeline-tbody');
+  if (tbody) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted); font-size:1rem;">
+          📍 ۱۲ وقتی یومیہ جدول دیکھنے کے لیے براہِ کرم اوپر سے اپنا شہر منتخب فرمائیں۔
+        </td>
+      </tr>
+    `;
+  }
+
+  // Weather widget
+  const condEl = document.getElementById('weather-condition-urdu');
+  const tempEl = document.getElementById('weather-temp-value');
+  const riseEl = document.getElementById('weather-sunrise-val');
+  const setEl = document.getElementById('weather-sunset-val');
+  if (condEl) condEl.textContent = 'شہر منتخب کریں';
+  if (tempEl) tempEl.textContent = '--';
+  if (riseEl) riseEl.textContent = '--:--';
+  if (setEl) setEl.textContent = '--:--';
+}
+
 // 8. Core Prayer UI Rendering
 function updatePrayerUI() {
   const timings = prayerService.currentTimings;
-  if (!timings) return;
+  if (!timings) {
+    renderNoCitySelectedState();
+    return;
+  }
 
   const pktDate = prayerService.getPakistanDate();
   const eventState = prayerService.getDetailedEventState(pktDate);

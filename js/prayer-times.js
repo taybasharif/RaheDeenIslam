@@ -51,7 +51,7 @@ const PAK_CITIES = {
 class PrayerTimeEngine {
   constructor() {
     const savedCity = typeof localStorage !== 'undefined' ? localStorage.getItem('rahedeen_city') : null;
-    this.currentCityKey = (savedCity && PAK_CITIES[savedCity]) ? savedCity : 'vehari';
+    this.currentCityKey = (savedCity && PAK_CITIES[savedCity]) ? savedCity : null;
     this.currentSchool = 1; // 1 = Hanafi, 0 = Shafi'i
     this.currentTimings = null;
     this.currentWeather = null;
@@ -102,50 +102,39 @@ class PrayerTimeEngine {
   }
 
   // Synchronized Pakistan Date & Time (Asia/Karachi, UTC+5)
-  getPakistanDate() {
-    const now = new Date();
-    const formatter = new Intl.DateTimeFormat('en-GB', {
-      timeZone: this.timeZone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
+  // Uses absolute UTC offset (UTC+5 hours, no DST) to ensure zero 9-hour offset worldwide
+  getPakistanDate(inputDate) {
+    const d = (inputDate instanceof Date) ? inputDate : new Date();
+    // Pakistan Standard Time is strictly UTC+05:00 with no Daylight Saving Time.
+    // Shift epoch milliseconds by exactly +5 hours, then read UTC parts.
+    const pktMs = d.getTime() + (5 * 3600 * 1000);
+    const pktDate = new Date(pktMs);
 
-    const parts = formatter.formatToParts(now);
-    const getPart = (type) => parts.find(p => p.type === type)?.value || '';
+    const year = pktDate.getUTCFullYear();
+    const month = pktDate.getUTCMonth() + 1;
+    const day = pktDate.getUTCDate();
+    const hour = pktDate.getUTCHours();
+    const minute = pktDate.getUTCMinutes();
+    const second = pktDate.getUTCSeconds();
 
-    const day = getPart('day');
-    const month = getPart('month');
-    const year = getPart('year');
-    const hour = getPart('hour');
-    const minute = getPart('minute');
-    const second = getPart('second');
-
-    const dateStrDDMMYYYY = `${day}-${month}-${year}`;
+    const dateStrDDMMYYYY = `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${year}`;
     const monthsUrdu = ['جنوری', 'فروری', 'مارچ', 'اپریل', 'مئی', 'جون', 'جولائی', 'اگست', 'ستمبر', 'اکتوبر', 'نومبر', 'دسمبر'];
-    const monthName = monthsUrdu[parseInt(month, 10) - 1];
-    const dateFormattedUrdu = `${parseInt(day, 10)} ${monthName} ${year}ء`;
+    const monthName = monthsUrdu[month - 1];
+    const dateFormattedUrdu = `${day} ${monthName} ${year}ء`;
 
-    const hourNum = parseInt(hour, 10);
-    const minNum = parseInt(minute, 10);
-    const secNum = parseInt(second, 10);
-    const ampm = hourNum >= 12 ? 'PM' : 'AM';
-    const hour12 = hourNum % 12 || 12;
-    const timeFormatted = `${String(hour12).padStart(2, '0')}:${minute}:${second} ${ampm} (PKT)`;
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    const timeFormatted = `${String(hour12).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')} ${ampm} (PKT)`;
 
     return {
-      day: parseInt(day, 10),
-      month: parseInt(month, 10),
-      year: parseInt(year, 10),
-      hour: hourNum,
-      minute: minNum,
-      second: secNum,
-      totalSeconds: hourNum * 3600 + minNum * 60 + secNum,
-      totalMinutes: hourNum * 60 + minNum + secNum / 60,
+      day,
+      month,
+      year,
+      hour,
+      minute,
+      second,
+      totalSeconds: hour * 3600 + minute * 60 + second,
+      totalMinutes: hour * 60 + minute + second / 60,
       dateStrDDMMYYYY,
       dateFormattedUrdu,
       timeFormatted
@@ -163,9 +152,17 @@ class PrayerTimeEngine {
 
   // Fetch timings for selected Pakistani city
   async fetchTimings(cityKey = this.currentCityKey, school = this.currentSchool, forceRefresh = false) {
-    this.setCity(cityKey);
-    this.currentSchool = parseInt(school, 10);
-    const city = PAK_CITIES[this.currentCityKey] || PAK_CITIES.vehari;
+    if (!cityKey && !this.currentCityKey) {
+      this.currentTimings = null;
+      return { success: false, noCity: true };
+    }
+    if (cityKey) this.setCity(cityKey);
+    this.currentSchool = parseInt(school, 10) || 1;
+    const city = PAK_CITIES[this.currentCityKey];
+    if (!city) {
+      this.currentTimings = null;
+      return { success: false, noCity: true };
+    }
     const pktDate = this.getPakistanDate();
     this.lastFetchedDateStr = pktDate.dateStrDDMMYYYY;
 
@@ -481,20 +478,7 @@ class PrayerTimeEngine {
     }
 
     if (!pktDate || typeof pktDate.totalMinutes !== 'number') {
-      if (pktDate instanceof Date) {
-        const h = pktDate.getHours();
-        const min = pktDate.getMinutes();
-        const s = pktDate.getSeconds();
-        pktDate = {
-          hour: h,
-          minute: min,
-          second: s,
-          totalSeconds: h * 3600 + min * 60 + s,
-          totalMinutes: h * 60 + min + s / 60
-        };
-      } else {
-        pktDate = this.getPakistanDate();
-      }
+      pktDate = this.getPakistanDate(pktDate);
     }
 
     const m = this.currentTimings.minutesMap;
@@ -549,7 +533,7 @@ class PrayerTimeEngine {
 
     const fivePrayers = fardDefinitions.map(p => {
       let isCurrent = false;
-      let isNext = (p.id === nextFard.id);
+      let isNext = false;
       let isPassed = false;
       let statusUrdu = '';
       let countdownFormatted = '00 : 00 : 00';
@@ -566,16 +550,17 @@ class PrayerTimeEngine {
         remainingSec = Math.max(0, Math.floor(endDiffM * 60));
         countdownFormatted = PrayerTimeEngine.formatHMS(remainingSec);
         countdownLabel = 'وقت ختم ہونے میں باقی وقت:';
+      } else if (p.id === nextFard.id) {
+        isNext = true;
+        statusUrdu = 'اگلی فرض نماز';
+        countdownLabel = 'نماز شروع ہونے میں باقی وقت:';
+        remainingSec = Math.max(0, Math.floor(nextFardSec));
+        countdownFormatted = PrayerTimeEngine.formatHMS(remainingSec);
       } else if (p.startM > currentMin) {
+        statusUrdu = 'آنے والا وقت';
+        countdownLabel = 'شروع ہونے میں باقی وقت:';
         remainingSec = Math.max(0, Math.floor((p.startM - currentMin) * 60));
         countdownFormatted = PrayerTimeEngine.formatHMS(remainingSec);
-        if (isNext) {
-          statusUrdu = 'اگلی فرض نماز';
-          countdownLabel = 'نماز شروع ہونے میں باقی وقت:';
-        } else {
-          statusUrdu = 'آنے والا وقت';
-          countdownLabel = 'شروع ہونے میں باقی وقت:';
-        }
       } else {
         isPassed = true;
         statusUrdu = 'وقت گزر چکا ہے';
@@ -702,8 +687,11 @@ class PrayerTimeEngine {
     } else if (currentMin >= m.asr && currentMin < m.maghrib) {
       currentEvent = { nameUrdu: 'نمازِ عصر', type: 'fard', time12: t12.Asr, desc: 'نمازِ عصر کا وقت جاری ہے', endM: m.maghrib };
       nextEventOrNafl = { nameUrdu: 'نمازِ مغرب', type: 'fard', time12: t12.Maghrib, desc: 'اگلی فرض نماز (غروبِ آفتاب)', startM: m.maghrib };
-    } else if (currentMin >= m.maghrib && currentMin < m.isha) {
-      currentEvent = { nameUrdu: 'نمازِ مغرب و اوابین', type: 'fard_nafl', time12: t12.Maghrib, desc: 'مغرب و اوابین کے نوافل کا وقت جاری ہے', endM: m.isha };
+    } else if (currentMin >= m.maghrib && currentMin < m.awwabin) {
+      currentEvent = { nameUrdu: 'نمازِ مغرب', type: 'fard', time12: t12.Maghrib, desc: 'نمازِ مغرب کا وقت جاری ہے', endM: m.awwabin };
+      nextEventOrNafl = { nameUrdu: 'نمازِ اوابین', type: 'nafl', time12: t12.Awwabin, desc: 'مغرب کے بعد کے مسنون نوافل', startM: m.awwabin };
+    } else if (currentMin >= m.awwabin && currentMin < m.isha) {
+      currentEvent = { nameUrdu: 'نمازِ اوابین', type: 'nafl', time12: t12.Awwabin, desc: 'اوابین کے نوافل کا وقت جاری ہے', endM: m.isha };
       nextEventOrNafl = { nameUrdu: 'نمازِ عشاء', type: 'fard', time12: t12.Isha, desc: 'اگلی فرض نماز', startM: m.isha };
     } else {
       // Night Time: Isha to Fajr

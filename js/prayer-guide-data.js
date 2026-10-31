@@ -443,3 +443,12 @@ if (typeof window !== 'undefined') {
   window.NAFL_PRAYERS_DETAIL = NAFL_PRAYERS_DETAIL;
   window.SALAH_STEP_BY_STEP = SALAH_STEP_BY_STEP;
 }
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    PRAYER_RAKATS_DATA,
+    RAKAT_CLASSIFICATIONS,
+    INDIVIDUAL_PRAYERS_DETAIL,
+    NAFL_PRAYERS_DETAIL,
+    SALAH_STEP_BY_STEP
+  };
+}
