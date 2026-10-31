@@ -569,12 +569,11 @@ function renderCurrentEventBanner(eventState) {
   `;
 }
 
-// Render Five Obligatory Prayer Cards (With Live HH : MM : SS Countdown on Every Card)
-function renderFivePrayerCards(eventState) {
-  const container = document.getElementById('five-prayers-container');
-  if (!container || !eventState.fivePrayers) return;
+// Helper: Generate Five Obligatory Prayer Cards HTML
+function getFivePrayerCardsHtml(eventState) {
+  if (!eventState || !eventState.fivePrayers) return '';
 
-  container.innerHTML = eventState.fivePrayers.map(p => {
+  return eventState.fivePrayers.map(p => {
     const highlightClass = p.isNext ? 'next-highlight' : '';
 
     return `
@@ -599,6 +598,13 @@ function renderFivePrayerCards(eventState) {
       </a>
     `;
   }).join('');
+}
+
+// Render Five Obligatory Prayer Cards
+function renderFivePrayerCards(eventState) {
+  const container = document.getElementById('five-prayers-container');
+  if (!container || !eventState.fivePrayers) return;
+  container.innerHTML = getFivePrayerCardsHtml(eventState);
 }
 
 // Render Dual Indicators: 1. اگلی فرض نماز | 2. اگلا اہم وقت / نفل نماز
@@ -639,10 +645,9 @@ function renderDualIndicators(eventState) {
   }
 }
 
-// Render Dedicated Isha & Tahajjud Night Sequence Section with Explicit Time Mention & Live Countdown
-function renderTahajjudNightPanel(eventState, timings) {
-  const container = document.getElementById('tahajjud-night-panel');
-  if (!container || !eventState.tahajjud) return;
+// Helper: Generate Dedicated Tahajjud Night Sequence HTML
+function getTahajjudNightPanelHtml(eventState, timings) {
+  if (!eventState || !eventState.tahajjud) return '';
 
   const th = eventState.tahajjud;
   const isNight = th.isNightWindow;
@@ -652,14 +657,14 @@ function renderTahajjudNightPanel(eventState, timings) {
   const tahajjudUrdu = (timings && timings.timingsUrdu && timings.timingsUrdu.Tahajjud) ? timings.timingsUrdu.Tahajjud : (th.lastThirdStartTimeUrdu || '--:--');
   const fajrTime = (timings && timings.timings12 && timings.timings12.Fajr) ? timings.timings12.Fajr : (th.fajrTime12 || '--:--');
 
-  container.innerHTML = `
+  return `
     <div class="tahajjud-panel-header">
       <div>
         <span class="crescent-badge" style="background:rgba(212,175,55,0.25); color:var(--gold-300); border-color:var(--gold-400); margin-bottom:8px;">
           ✨ ${th.badgeText || 'رات کا قیام'}
         </span>
         <h3 style="font-size:1.85rem; color:#ffffff; margin:6px 0;">
-          ${th.activeHeading || th.statusUrdu || 'نمازِ تہجد'}
+          ${th.activeHeading || th.statusUrdu || 'نمازِ تہجد و صلاۃ اللیل'}
         </h3>
         <p class="urdu-text" style="color:var(--ivory-200); font-size:1rem; margin:0; line-height:1.6;">
           تہجد کا وقت عشاء کی نماز کے بعد سے صبح صادق تک ہے۔
@@ -677,17 +682,8 @@ function renderTahajjudNightPanel(eventState, timings) {
       </div>
     </div>
 
-    <!-- Prominent Hero Live Countdown Clock -->
-    <div class="tahajjud-hero-clock-box">
-      <div class="tahajjud-hero-clock-label">⏱️ ${th.activeCountdownLabel || 'تہجد میں باقی وقت:'}</div>
-      <div class="tahajjud-hero-clock-digits">${th.activeCountdownFormatted || '00 : 00 : 00'}</div>
-      <div style="font-size:0.88rem; color:var(--gold-200); margin-top:4px;">
-        ${isNight ? 'عشاء کے بعد کی شب بیداری اور سحر کے مبارک اوقات (پاکستان ٹائم زون UTC+5)' : 'آج رات عشاء کے بعد تہجد کا وقت شروع ہوگا'}
-      </div>
-    </div>
-
     <!-- 4-Box Detail Grid -->
-    <div class="tahajjud-panel-grid">
+    <div class="tahajjud-panel-grid" style="margin-top:16px;">
       <!-- Box 1: Isha Time -->
       <div class="tahajjud-stat-box">
         <div class="tahajjud-stat-label">نمازِ عشاء کا وقت</div>
@@ -719,13 +715,18 @@ function renderTahajjudNightPanel(eventState, timings) {
   `;
 }
 
-// Render All 12 Prayers & Sacred Timings Sequence Grid (Zero 'undefined' guaranteed)
-function renderAllSequencePrayers(eventState) {
-  const container = document.getElementById('all-sequence-prayers-container');
-  if (!container || !eventState || !Array.isArray(eventState.allSequenceEvents)) return;
+// Render Dedicated Isha & Tahajjud Night Sequence Section
+function renderTahajjudNightPanel(eventState, timings) {
+  const container = document.getElementById('tahajjud-night-panel');
+  if (!container || !eventState.tahajjud) return;
+  container.innerHTML = getTahajjudNightPanelHtml(eventState, timings);
+}
 
-  container.innerHTML = eventState.allSequenceEvents.map(ev => {
-    let typeClass = 'badge-gold';
+// Helper: Generate All 12 Prayers & Sacred Timings Sequence Grid HTML
+function getAllSequencePrayersHtml(eventState) {
+  if (!eventState || !Array.isArray(eventState.allSequenceEvents)) return '';
+
+  return eventState.allSequenceEvents.map(ev => {
     let typeStyle = 'background:var(--gold-50); color:var(--gold-700); border:1px solid var(--gold-400);';
     if (ev.type === 'fard') {
       typeStyle = 'background:var(--emerald-50); color:var(--emerald-900); border:1px solid var(--emerald-600);';
@@ -773,6 +774,62 @@ function renderAllSequencePrayers(eventState) {
       </div>
     `;
   }).join('');
+}
+
+// Render All 12 Prayers & Sacred Timings Sequence Grid (Zero 'undefined' guaranteed)
+function renderAllSequencePrayers(eventState) {
+  const container = document.getElementById('all-sequence-prayers-container');
+  if (!container || !eventState || !Array.isArray(eventState.allSequenceEvents)) return;
+  container.innerHTML = getAllSequencePrayersHtml(eventState);
+}
+
+// Helper: Generate Quick Punjab Cities Clickable Buttons HTML
+function getQuickPunjabCitiesHtml(activeCityKey) {
+  const punjabCities = [
+    { key: 'lahore', name: 'لاہور' },
+    { key: 'faisalabad', name: 'فیصل آباد' },
+    { key: 'rawalpindi', name: 'راولپنڈی' },
+    { key: 'multan', name: 'ملتان' },
+    { key: 'gujranwala', name: 'گوجرانوالہ' },
+    { key: 'sialkot', name: 'سیالکوٹ' },
+    { key: 'sargodha', name: 'سرگودھا' },
+    { key: 'bahawalpur', name: 'بہاولپور' },
+    { key: 'dera_ghazi_khan', name: 'ڈی جی خان' },
+    { key: 'sahiwal', name: 'ساہیوال' },
+    { key: 'rahim_yar_khan', name: 'رحیم یار خان' },
+    { key: 'kasur', name: 'قصور' },
+    { key: 'jhang', name: 'جھنگ' },
+    { key: 'sheikhupura', name: 'شیخوپورہ' },
+    { key: 'vehari', name: 'وہاڑی' },
+    { key: 'chishtian', name: 'چشتیاں' },
+    { key: 'gujrat', name: 'گجرات' },
+    { key: 'okara', name: 'اوکاڑہ' },
+    { key: 'bahawalnagar', name: 'بہاولنگر' },
+    { key: 'mianwali', name: 'میانوالی' },
+    { key: 'muzaffargarh', name: 'مظفر گڑھ' },
+    { key: 'chakwal', name: 'چکوال' },
+    { key: 'jhelum', name: 'جہلم' }
+  ];
+
+  const btns = punjabCities.map(c => {
+    const isSelected = activeCityKey === c.key;
+    const btnCls = isSelected ? 'btn-gold' : 'btn-outline-gold';
+    return `<button type="button" class="btn btn-sm ${btnCls}" onclick="onCityDropdownChange('${c.key}')">${c.name}</button>`;
+  }).join(' ');
+
+  return `
+    <div style="background:var(--ivory-50); border:1.5px solid var(--gold-400); border-radius:14px; padding:18px 20px; text-align:center; margin-bottom:28px;">
+      <div style="font-weight:700; color:var(--emerald-950); font-size:1.05rem; margin-bottom:6px;">
+        📍 پنجاب کے شہر (براہِ راست وقت تبدیل کرنے کے لیے اپنے شہر پر کلک کریں):
+      </div>
+      <div style="font-size:0.88rem; color:var(--text-muted); margin-bottom:12px;">
+        کسی بھی شہر پر کلک کریں، تمام نمازوں کے اوقات اور لائیو کاؤنٹ ڈاؤن فوری تبدیل ہو جائیں گے:
+      </div>
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px;">
+        ${btns}
+      </div>
+    </div>
+  `;
 }
 
 // Render Chronological 12-Event Timeline Table
@@ -869,7 +926,7 @@ function renderQuickBarPills(timings, eventState) {
   `).join('');
 }
 
-// Render Home Live Widget with Live Hourglass ⏳ Countdown, 12-Hour AM/PM, Chasht, Awwabin, and Tahajjud
+// Render Home Live Widget with ONLY ONE Live Hourglass ⏳ Countdown, 12-Hour AM/PM, Chasht, Awwabin, and Tahajjud
 function renderHomeLiveWidget(timings, eventState) {
   const container = document.getElementById('home-live-countdown-container');
   if (!container) return;
@@ -890,7 +947,6 @@ function renderHomeLiveWidget(timings, eventState) {
   const nextNaflName = nextNafl.nameUrdu || 'نفل نماز / اہم وقت';
   const nextNaflTime = nextNafl.time12 || '--:--';
   const nextNaflClock = nextNafl.countdownFormatted || '00 : 00 : 00';
-  const nextNaflDesc = nextNafl.desc || 'یومیہ تقویمِ عبادات';
 
   // Current Active Event Name
   const currentEv = eventState.currentEvent || {};
@@ -916,7 +972,7 @@ function renderHomeLiveWidget(timings, eventState) {
     targetNextClock = nextNafl.countdownFormatted;
   }
 
-  // Hero Status Banner (User Requested Exact Structure: "عشاء کا وقت جاری ہے | اگلی نماز [نمازِ تہجد] میں اتنا وقت باقی ہے")
+  // Hero Status Banner: ONLY ONE countdown on the Home page (User Requested: "عشاء کا وقت جاری ہے | اگلی نماز [نمازِ تہجد] میں اتنا وقت باقی ہے")
   const heroBannerHtml = `
     <div class="card card-crest live-status-hero-banner" style="background:linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%); color:#ffffff; padding:24px 20px; border-radius:16px; border:2px solid var(--gold-400); margin-bottom:24px; text-align:center; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
       <!-- Live Pulse Dot & Current Prayer Status -->
@@ -930,7 +986,7 @@ function renderHomeLiveWidget(timings, eventState) {
         اگلی نماز <span style="color:var(--gold-300); text-decoration:underline; text-underline-offset:6px;">[${targetNextName}]</span> میں اتنا وقت باقی ہے:
       </h3>
 
-      <!-- Digital Countdown Clock with ⏳ -->
+      <!-- Digital Countdown Clock with ⏳ (THE ONLY COUNTDOWN ON HOME PAGE) -->
       <div style="font-family:'Plus Jakarta Sans', monospace; font-size:2.5rem; font-weight:800; color:var(--gold-300); letter-spacing:3px; direction:ltr; display:inline-block; background:rgba(0,0,0,0.5); padding:10px 28px; border-radius:12px; border:2px solid rgba(212,175,55,0.6); box-shadow:inset 0 2px 8px rgba(0,0,0,0.4); margin-bottom:10px;">
         ⏳ ${targetNextClock}
       </div>
@@ -941,71 +997,43 @@ function renderHomeLiveWidget(timings, eventState) {
     </div>
   `;
 
+  const quickCitiesHtml = getQuickPunjabCitiesHtml(appState.selectedCity);
+  const fivePrayersHtml = getFivePrayerCardsHtml(eventState);
+  const tahajjudPanelHtml = getTahajjudNightPanelHtml(eventState, timings);
+  const allSequenceHtml = getAllSequencePrayersHtml(eventState);
+
   container.innerHTML = `
     ${heroBannerHtml}
 
-    <div class="dual-indicators-container" style="margin-bottom:20px;">
-      <!-- Next Fard Indicator -->
-      <div class="indicator-card">
-        <span class="indicator-badge">📍 ${cityName} — اگلی فرض نماز</span>
-        <div class="indicator-title">${nextFardName} (${nextFardTime})</div>
-        <div class="indicator-clock">⏳ ${nextFardClock}</div>
-        <div class="indicator-subtext">فرض نماز کا وقت (گھنٹے : منٹ : سیکنڈ)</div>
-        <div style="margin-top:14px;">
-          <a href="#prayer-times" class="btn btn-sm btn-gold" data-route="prayer-times">
-            مکمل ۱۲ اوقات و جدول دیکھیں ←
-          </a>
-        </div>
-      </div>
+    ${quickCitiesHtml}
 
-      <!-- Next Recommended / Nafl Indicator (Chasht, Ishraq, Awwabin, Tahajjud) -->
-      <div class="indicator-card nafl-indicator">
-        <span class="indicator-badge">اگلا اہم وقت / مسنون نفل نماز</span>
-        <div class="indicator-title">${nextNaflName} (${nextNaflTime})</div>
-        <div class="indicator-clock">⏳ ${nextNaflClock}</div>
-        <div class="indicator-subtext">${nextNaflDesc} (گھنٹے : منٹ : سیکنڈ)</div>
-        <div style="margin-top:14px;">
-          <a href="#prayer-times" class="btn btn-sm btn-outline-gold" data-route="prayer-times">
-            اشراق، چاشت و اوابین کے اوقات ←
-          </a>
-        </div>
-      </div>
-    </div>`;
+    <!-- Five Obligatory Prayers Section on Home Page -->
+    <div class="section-header" style="margin-bottom:16px; text-align:center;">
+      <span class="section-badge">پانچ فرض نمازیں</span>
+      <h3 class="section-title">آج کی فرض نمازوں کے اوقات برائے ${cityName}</h3>
+      <p style="font-size:0.92rem; color:var(--text-muted);">ہر نماز کا وقت، رکعات اور موجودہ صورتحال ملاحظہ فرمائیں۔</p>
+    </div>
+    <div class="five-prayers-grid" style="margin-bottom:28px;">
+      ${fivePrayersHtml}
+    </div>
 
-    <!-- Quick Punjab Cities Switcher on Home Page -->
-    <div style="background:var(--ivory-50); border:1.5px solid var(--gold-400); border-radius:14px; padding:18px 20px; text-align:center; margin-bottom:28px;">
-      <div style="font-weight:700; color:var(--emerald-950); font-size:1.05rem; margin-bottom:6px;">
-        📍 پنجاب کے شہر (براہِ راست وقت تبدیل کرنے کے لیے اپنے شہر پر کلک کریں):
-      </div>
-      <div style="font-size:0.88rem; color:var(--text-muted); margin-bottom:12px;">
-        کسی بھی شہر پر کلک کریں، نماز کے اوقات اور لائیو کاؤنٹ ڈاؤن فوری تبدیل ہو جائیں گے:
-      </div>
-      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px;">
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'lahore' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('lahore')">لاہور</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'faisalabad' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('faisalabad')">فیصل آباد</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'rawalpindi' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('rawalpindi')">راولپنڈی</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'multan' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('multan')">ملتان</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'gujranwala' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('gujranwala')">گوجرانوالہ</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'sialkot' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sialkot')">سیالکوٹ</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'sargodha' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sargodha')">سرگودھا</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'bahawalpur' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('bahawalpur')">بہاولپور</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'dera_ghazi_khan' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('dera_ghazi_khan')">ڈی جی خان</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'sahiwal' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sahiwal')">ساہیوال</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'rahim_yar_khan' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('rahim_yar_khan')">رحیم یار خان</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'kasur' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('kasur')">قصور</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'jhang' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('jhang')">جھنگ</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'sheikhupura' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sheikhupura')">شیخوپورہ</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'vehari' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('vehari')">وہاڑی</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'chishtian' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('chishtian')">چشتیاں</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'gujrat' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('gujrat')">گجرات</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'okara' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('okara')">اوکاڑہ</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'bahawalnagar' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('bahawalnagar')">بہاولنگر</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'mianwali' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('mianwali')">میانوالی</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'muzaffargarh' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('muzaffargarh')">مظفر گڑھ</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'chakwal' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('chakwal')">چکوال</button>
-        <button type="button" class="btn btn-sm ${appState.selectedCity === 'jhelum' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('jhelum')">جہلم</button>
-      </div>
-    </div>`;
+    <!-- Dedicated Isha & Tahajjud Night Sequence Panel on Home Page -->
+    <div class="tahajjud-night-panel" style="margin-bottom:28px;">
+      ${tahajjudPanelHtml}
+    </div>
+
+    <!-- Complete 12 Prayers & Sacred Timings Sequence on Home Page -->
+    <div class="section-header" style="margin-top:20px; margin-bottom:16px; text-align:center;">
+      <span class="section-badge">یومیہ تقویم و ترتیبِ عبادات</span>
+      <h3 class="section-title">تمام ۱۲ فرائض و نوافل بلحاظِ ترتیب مع اوقات (اشراق، چاشت، زوال، اوابین، تہجد)</h3>
+      <p class="section-desc">
+        پاکستان اسٹینڈرڈ ٹائم (UTC+5) کے مطابق فجر، طلوع، اشراق، چاشت، وقتِ زوال، ظہر، عصر حنفی، مغرب، اوابین، عشاء، نصف اللیل اور تہجد۔
+      </p>
+    </div>
+    <div class="all-sequence-grid" style="margin-bottom:28px;">
+      ${allSequenceHtml}
+    </div>
+  `;
 }
 
 function renderHomeNoCityState() {
@@ -1994,4 +2022,14 @@ function openMonthlyTimetableModal() {
 function closeModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.remove('active');
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    renderHomeLiveWidget,
+    getFivePrayerCardsHtml,
+    getTahajjudNightPanelHtml,
+    getAllSequencePrayersHtml,
+    getQuickPunjabCitiesHtml
+  };
 }
