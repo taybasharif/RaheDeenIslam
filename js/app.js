@@ -153,7 +153,7 @@ function showPageView(viewId) {
   if (el) el.classList.add('active');
 }
 
-// 4. City Dropdown & Search System (Punjab Cities Prominently Grouped)
+// 4. City Dropdown & Search System (Strictly Punjab Cities)
 function initCitySelector() {
   const quickSelect = document.getElementById('quick-city-select');
   const mainDropdown = document.getElementById('main-city-dropdown');
@@ -164,41 +164,28 @@ function initCitySelector() {
     if (!selectEl) return;
     selectEl.innerHTML = '';
 
-    // Default placeholder option: "شہر منتخب کریں" (Always selected on initial load)
+    // Default placeholder option: "شہر منتخب کریں (پنجاب)"
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = 'شہر منتخب کریں';
+    placeholder.textContent = 'شہر منتخب کریں (پنجاب)';
     placeholder.disabled = true;
     placeholder.selected = true;
     selectEl.appendChild(placeholder);
 
-    // Group 1: Punjab Cities (پنجاب کے اہم شہر)
-    const punjabGroup = document.createElement('optgroup');
-    punjabGroup.label = '--- پنجاب کے اہم شہر (Punjab Cities) ---';
-
-    // Group 2: Other Pakistani Cities (دیگر پاکستانی شہر)
-    const otherGroup = document.createElement('optgroup');
-    otherGroup.label = '--- دیگر پاکستانی شہر (Other Pakistani Cities) ---';
-
     for (const [key, city] of Object.entries(PAK_CITIES)) {
       const option = document.createElement('option');
       option.value = key;
-      option.textContent = `${city.nameUrdu} (${city.nameEn}) — ${city.province}`;
-
-      if (city.province === 'پنجاب') {
-        punjabGroup.appendChild(option);
-      } else {
-        otherGroup.appendChild(option);
-      }
+      option.textContent = `${city.nameUrdu} (${city.nameEn})`;
+      selectEl.appendChild(option);
     }
-
-    selectEl.appendChild(punjabGroup);
-    selectEl.appendChild(otherGroup);
   };
 
   populateSelect(quickSelect);
   populateSelect(mainDropdown);
 
+  if (mainDropdown) {
+    mainDropdown.addEventListener('change', (e) => onCityDropdownChange(e.target.value));
+  }
   if (quickSelect) {
     quickSelect.addEventListener('change', (e) => onCityDropdownChange(e.target.value));
   }
@@ -210,45 +197,29 @@ function filterCityDropdown(query) {
   const mainDropdown = document.getElementById('main-city-dropdown');
   if (!mainDropdown) return;
 
-  const cleanQuery = query.trim().toLowerCase();
+  const cleanQuery = (query || '').trim().toLowerCase();
   mainDropdown.innerHTML = '';
 
   const placeholder = document.createElement('option');
   placeholder.value = '';
-  placeholder.textContent = 'شہر منتخب کریں';
+  placeholder.textContent = cleanQuery ? '--- تلاش کے نتائج (پنجاب) ---' : 'شہر منتخب کریں (پنجاب)';
   placeholder.disabled = true;
   if (!appState.selectedCity) {
     placeholder.selected = true;
   }
   mainDropdown.appendChild(placeholder);
 
-  const punjabGroup = document.createElement('optgroup');
-  punjabGroup.label = '--- پنجاب کے اہم شہر (Punjab Cities) ---';
-
-  const otherGroup = document.createElement('optgroup');
-  otherGroup.label = '--- دیگر پاکستانی شہر (Other Pakistani Cities) ---';
-
   for (const [key, city] of Object.entries(PAK_CITIES)) {
     const matchUrdu = city.nameUrdu.includes(cleanQuery);
     const matchEn = city.nameEn.toLowerCase().includes(cleanQuery);
-    const matchProv = city.province.includes(cleanQuery);
-
-    if (!cleanQuery || matchUrdu || matchEn || matchProv) {
+    if (!cleanQuery || matchUrdu || matchEn) {
       const option = document.createElement('option');
       option.value = key;
-      option.textContent = `${city.nameUrdu} (${city.nameEn}) — ${city.province}`;
+      option.textContent = `${city.nameUrdu} (${city.nameEn})`;
       if (key === appState.selectedCity) option.selected = true;
-
-      if (city.province === 'پنجاب') {
-        punjabGroup.appendChild(option);
-      } else {
-        otherGroup.appendChild(option);
-      }
+      mainDropdown.appendChild(option);
     }
   }
-
-  if (punjabGroup.children.length > 0) mainDropdown.appendChild(punjabGroup);
-  if (otherGroup.children.length > 0) mainDropdown.appendChild(otherGroup);
 }
 
 async function onCityDropdownChange(cityKey) {
@@ -365,11 +336,10 @@ function showRefreshToast(msg, type = 'success') {
 async function loadPrayerData(forceRefresh = false) {
   prayerService.addListener(updatePrayerUI);
   prayerService.addWeatherListener(updateWeatherUI);
-  if (appState.selectedCity) {
-    await prayerService.fetchTimings(appState.selectedCity, appState.selectedSchool, forceRefresh);
-  } else {
-    updatePrayerUI();
-  }
+  // Default calculate for Punjab baseline (Lahore) so live countdown is immediately active and ticking
+  const activeCityKey = appState.selectedCity || 'lahore';
+  await prayerService.fetchTimings(activeCityKey, appState.selectedSchool, forceRefresh);
+  updatePrayerUI();
 }
 
 function updateWeatherUI(weather) {
@@ -899,18 +869,18 @@ function renderQuickBarPills(timings, eventState) {
   `).join('');
 }
 
-// Render Home Live Widget (Zero 'undefined' guaranteed + Punjab City Switcher)
+// Render Home Live Widget with Live Hourglass ⏳ Countdown, 12-Hour AM/PM, Chasht, Awwabin, and Tahajjud
 function renderHomeLiveWidget(timings, eventState) {
   const container = document.getElementById('home-live-countdown-container');
   if (!container) return;
 
-  if (!appState.selectedCity || !timings || !timings.city || !eventState || !eventState.nextFard) {
-    renderHomeNoCityState();
+  if (!timings || !timings.city || !eventState || !eventState.nextFard) {
     return;
   }
 
   const city = timings.city;
-  const cityName = city.nameUrdu || 'پنجاب';
+  const isCityExplicit = !!appState.selectedCity;
+  const cityName = isCityExplicit ? (city.nameUrdu || 'پنجاب') : 'پنجاب (مرکزی معیاری وقت)';
   const nextFard = eventState.nextFard || {};
   const nextFardName = nextFard.nameUrdu || 'اگلی نماز';
   const nextFardTime = nextFard.time12 || '--:--';
@@ -922,39 +892,70 @@ function renderHomeLiveWidget(timings, eventState) {
   const nextNaflClock = nextNafl.countdownFormatted || '00 : 00 : 00';
   const nextNaflDesc = nextNafl.desc || 'یومیہ تقویمِ عبادات';
 
+  // Night Tahajjud Banner (Active between Isha and Fajr)
+  const th = eventState.tahajjud || {};
+  const isNight = th.isNightWindow;
+  const tahajjudClock = th.activeCountdownFormatted || th.countdownToLastThird || '00 : 00 : 00';
+  const tahajjudTime = (timings && timings.timings12 && timings.timings12.Tahajjud) || th.lastThirdTime12 || '01:15 AM';
+
+  let tahajjudHtml = '';
+  if (isNight) {
+    tahajjudHtml = `
+      <div class="card card-crest" style="background:linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%); color:#ffffff; padding:20px; border-radius:14px; border:2px solid var(--gold-400); margin-bottom:20px; text-align:center;">
+        <span class="crescent-badge" style="background:rgba(212,175,55,0.25); color:var(--gold-300); border-color:var(--gold-400); margin-bottom:6px; display:inline-block; font-size:0.88rem; padding:4px 14px; border-radius:20px;">
+          🌙 عشاء کے بعد کا وقت — نمازِ تہجد و صلاۃ اللیل
+        </span>
+        <h4 style="font-size:1.35rem; color:#ffffff; margin:6px 0;">
+          تہجد کا وقت (رات کا آخری تہائی حصہ): <span style="color:var(--gold-300);">${tahajjudTime}</span>
+        </h4>
+        <div style="font-size:0.9rem; color:var(--ivory-200); margin-bottom:10px;">
+          تہجد کا لائیو کاؤنٹ ڈاؤن (گھنٹے : منٹ : سیکنڈ):
+        </div>
+        <div style="font-family:'Plus Jakarta Sans', monospace; font-size:1.85rem; font-weight:800; color:var(--gold-300); letter-spacing:2px; direction:ltr; display:inline-block; background:rgba(0,0,0,0.4); padding:6px 20px; border-radius:10px; border:1px solid rgba(212,175,55,0.4);">
+          ⏳ ${tahajjudClock}
+        </div>
+      </div>
+    `;
+  }
+
   container.innerHTML = `
+    ${tahajjudHtml}
+
     <div class="dual-indicators-container" style="margin-bottom:20px;">
       <!-- Next Fard Indicator -->
       <div class="indicator-card">
-        <span class="indicator-badge">📍 ${cityName}، پاکستان — اگلی فرض نماز</span>
+        <span class="indicator-badge">📍 ${cityName} — اگلی فرض نماز</span>
         <div class="indicator-title">${nextFardName} (${nextFardTime})</div>
-        <div class="indicator-clock">${nextFardClock}</div>
-        <div class="indicator-subtext">نماز شروع ہونے میں باقی وقت (12 Hour AM/PM)</div>
+        <div class="indicator-clock">⏳ ${nextFardClock}</div>
+        <div class="indicator-subtext">نماز شروع ہونے میں باقی وقت (گھنٹے : منٹ : سیکنڈ)</div>
         <div style="margin-top:14px;">
           <a href="#prayer-times" class="btn btn-sm btn-gold" data-route="prayer-times">
-            مکمل اوقات و کاؤنٹ ڈاؤن ٹائمر دیکھیں ←
+            مکمل ۱۲ اوقات و کاؤنٹ ڈاؤن جدول ←
           </a>
         </div>
       </div>
 
-      <!-- Next Recommended / Nafl Indicator -->
+      <!-- Next Recommended / Nafl Indicator (Chasht, Ishraq, Awwabin, Tahajjud) -->
       <div class="indicator-card nafl-indicator">
-        <span class="indicator-badge">اگلا اہم وقت / نفل نماز</span>
+        <span class="indicator-badge">اگلا اہم وقت / مسنون نفل نماز</span>
         <div class="indicator-title">${nextNaflName} (${nextNaflTime})</div>
-        <div class="indicator-clock">${nextNaflClock}</div>
-        <div class="indicator-subtext">${nextNaflDesc}</div>
+        <div class="indicator-clock">⏳ ${nextNaflClock}</div>
+        <div class="indicator-subtext">${nextNaflDesc} (گھنٹے : منٹ : سیکنڈ)</div>
         <div style="margin-top:14px;">
           <a href="#prayer-times" class="btn btn-sm btn-outline-gold" data-route="prayer-times">
-            یومیہ تقویمِ عبادات دیکھیں ←
+            اشراق، چاشت و اوابین کے اوقات ←
           </a>
         </div>
       </div>
     </div>
 
     <!-- Quick Punjab Cities Switcher on Home Page -->
-    <div style="background:var(--ivory-50); border:1px solid rgba(212,175,55,0.3); border-radius:12px; padding:16px 20px; text-align:center; margin-bottom:28px;">
-      <div style="font-weight:700; color:var(--emerald-950); font-size:0.95rem; margin-bottom:8px;">
-        📍 دیگر پنجاب کے شہر کا وقت تبدیل کرنے کے لیے کلک کریں:
+    <div style="background:var(--ivory-50); border:1.5px solid var(--gold-400); border-radius:14px; padding:18px 20px; text-align:center; margin-bottom:28px;">
+      <div style="font-weight:700; color:var(--emerald-950); font-size:1.05rem; margin-bottom:6px;">
+        📍 پنجاب کے شہر (براہِ راست وقت تبدیل کرنے کے لیے اپنے شہر پر کلک کریں):
+      </div>
+      <div style="font-size:0.88rem; color:var(--text-muted); margin-bottom:12px;">
+        کسی بھی شہر پر کلک کریں، نماز کے اوقات اور لائیو کاؤنٹ ڈاؤن فوری تبدیل ہو جائیں گے:
       </div>
       <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px;">
         <button type="button" class="btn btn-sm ${appState.selectedCity === 'lahore' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('lahore')">لاہور</button>
@@ -973,9 +974,15 @@ function renderHomeLiveWidget(timings, eventState) {
         <button type="button" class="btn btn-sm ${appState.selectedCity === 'sheikhupura' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sheikhupura')">شیخوپورہ</button>
         <button type="button" class="btn btn-sm ${appState.selectedCity === 'vehari' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('vehari')">وہاڑی</button>
         <button type="button" class="btn btn-sm ${appState.selectedCity === 'chishtian' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('chishtian')">چشتیاں</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'gujrat' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('gujrat')">گجرات</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'okara' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('okara')">اوکاڑہ</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'bahawalnagar' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('bahawalnagar')">بہاولنگر</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'mianwali' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('mianwali')">میانوالی</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'muzaffargarh' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('muzaffargarh')">مظفر گڑھ</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'chakwal' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('chakwal')">چکوال</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'jhelum' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('jhelum')">جہلم</button>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 function renderHomeNoCityState() {
