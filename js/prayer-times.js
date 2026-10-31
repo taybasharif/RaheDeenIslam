@@ -50,8 +50,8 @@ const PAK_CITIES = {
 
 class PrayerTimeEngine {
   constructor() {
-    const savedCity = typeof localStorage !== 'undefined' ? localStorage.getItem('rahedeen_city') : null;
-    this.currentCityKey = (savedCity && PAK_CITIES[savedCity]) ? savedCity : null;
+    // Strictly do not specify or auto-select any city on load - user selects themselves
+    this.currentCityKey = null;
     this.currentSchool = 1; // 1 = Hanafi, 0 = Shafi'i
     this.currentTimings = null;
     this.currentWeather = null;
@@ -542,11 +542,11 @@ class PrayerTimeEngine {
     // 1. FIVE OBLIGATORY PRAYER CARDS DATA (WITH LIVE COUNTDOWN ON EVERY CARD)
     // -------------------------------------------------------------
     const fardDefinitions = [
-      { id: 'fajr', name: 'فجر', startM: m.fajr, endM: m.sunrise, time12: t12.Fajr, timeUrdu: tUrdu.Fajr, icon: '🌄', rakats: '۴ رکعات (۲ سنت + ۲ فرض)' },
-      { id: 'dhuhr', name: 'ظہر', startM: m.dhuhr, endM: m.asr, time12: t12.Dhuhr, timeUrdu: tUrdu.Dhuhr, icon: '☀️', rakats: '۱۲ رکعات (۴ سنت + ۴ فرض + ۲ سنت + ۲ نفل)' },
-      { id: 'asr', name: 'عصر', startM: m.asr, endM: m.maghrib, time12: t12.Asr, timeUrdu: tUrdu.Asr, icon: '🌤️', rakats: '۸ رکعات (۴ سنت + ۴ فرض)' },
-      { id: 'maghrib', name: 'مغرب', startM: m.maghrib, endM: m.isha, time12: t12.Maghrib, timeUrdu: tUrdu.Maghrib, icon: '🌇', rakats: '۷ رکعات (۳ فرض + ۲ سنت + ۲ نفل)' },
-      { id: 'isha', name: 'عشاء', startM: m.isha, endM: m.fajr + 1440, time12: t12.Isha, timeUrdu: tUrdu.Isha, icon: '🌙', rakats: '۱۷ رکعات (۴ سنت + ۴ فرض + ۲ سنت + ۲ نفل + ۳ وتر + ۲ نفل)' }
+      { id: 'fajr', name: 'فجر', nameUrdu: 'فجر', startM: m.fajr, endM: m.sunrise, time12: t12.Fajr, timeUrdu: tUrdu.Fajr, icon: '🌄', rakats: '۴ رکعات (۲ سنت + ۲ فرض)' },
+      { id: 'dhuhr', name: 'ظہر', nameUrdu: 'ظہر', startM: m.dhuhr, endM: m.asr, time12: t12.Dhuhr, timeUrdu: tUrdu.Dhuhr, icon: '☀️', rakats: '۱۲ رکعات (۴ سنت + ۴ فرض + ۲ سنت + ۲ نفل)' },
+      { id: 'asr', name: 'عصر', nameUrdu: 'عصر', startM: m.asr, endM: m.maghrib, time12: t12.Asr, timeUrdu: tUrdu.Asr, icon: '🌤️', rakats: '۸ رکعات (۴ سنت + ۴ فرض)' },
+      { id: 'maghrib', name: 'مغرب', nameUrdu: 'مغرب', startM: m.maghrib, endM: m.isha, time12: t12.Maghrib, timeUrdu: tUrdu.Maghrib, icon: '🌇', rakats: '۷ رکعات (۳ فرض + ۲ سنت + ۲ نفل)' },
+      { id: 'isha', name: 'عشاء', nameUrdu: 'عشاء', startM: m.isha, endM: m.fajr + 1440, time12: t12.Isha, timeUrdu: tUrdu.Isha, icon: '🌙', rakats: '۱۷ رکعات (۴ سنت + ۴ فرض + ۲ سنت + ۲ نفل + ۳ وتر + ۲ نفل)' }
     ];
 
     // Determine current obligatory prayer

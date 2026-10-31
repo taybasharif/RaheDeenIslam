@@ -22,8 +22,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="./css/style.css?v=2.3">
-  <link rel="stylesheet" href="./css/patterns.css?v=2.3">
+  <link rel="stylesheet" href="./css/style.css?v=2.4">
+  <link rel="stylesheet" href="./css/patterns.css?v=2.4">
 </head>
 <body class="bg-islamic-lattice">
 
@@ -137,8 +137,53 @@
         </div>
       </div>
 
-      <!-- Today's Highlights & Quick Countdown Container -->
-      <div id="home-live-countdown-container"></div>
+      <!-- Today's Highlights & Quick Countdown Container (Punjab Cities Direct Select) -->
+      <div id="home-live-countdown-container">
+        <div class="home-city-select-prompt card card-crest" style="margin-bottom:28px; text-align:center; padding:28px 20px;">
+          <span class="section-badge" style="margin-bottom:8px;">📍 مواقیت الصلاۃ برائے پنجاب و پاکستان</span>
+          <h3 style="color:var(--emerald-950); font-size:1.6rem; margin-bottom:8px;">
+            اپنا شہر منتخب فرمائیں (پنجاب کے اہم شہر)
+          </h3>
+          <p class="urdu-text" style="color:var(--text-muted); font-size:1rem; max-width:680px; margin:0 auto 16px;">
+            پانچوں فرض نمازوں (فجر، ظہر، عصر حنفی، مغرب، عشاء) کے درست اوقات، ۱۲ وقتی جدول، تہجد کا وقت اور سیکنڈ بہ سیکنڈ لائیو کاؤنٹ ڈاؤن دیکھنے کے لیے نیچے سے اپنے شہر پر کلک کریں:
+          </p>
+
+          <!-- Clickable Punjab City Buttons -->
+          <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:18px;">
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('lahore')">لاہور (Lahore)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('faisalabad')">فیصل آباد (Faisalabad)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rawalpindi')">راولپنڈی (Rawalpindi)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('multan')">ملتان (Multan)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('gujranwala')">گوجرانوالہ (Gujranwala)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sialkot')">سیالکوٹ (Sialkot)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sargodha')">سرگودھا (Sargodha)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('bahawalpur')">بہاولپور (Bahawalpur)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('dera_ghazi_khan')">ڈیرہ غازی خان (D.G. Khan)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sahiwal')">ساہیوال (Sahiwal)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rahim_yar_khan')">رحیم یار خان (R.Y. Khan)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('kasur')">قصور (Kasur)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('jhang')">جھنگ (Jhang)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sheikhupura')">شیخوپورہ (Sheikhupura)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('vehari')">وہاڑی (Vehari)</button>
+            <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('chishtian')">چشتیاں (Chishtian)</button>
+          </div>
+
+          <div class="dual-indicators-container" style="margin-top:14px;">
+            <div class="indicator-card">
+              <span class="indicator-badge">📍 اگلی فرض نماز</span>
+              <div class="indicator-title">شہر منتخب کریں</div>
+              <div class="indicator-clock">-- : -- : --</div>
+              <div class="indicator-subtext">براہِ کرم اوپر سے اپنے شہر پر کلک فرمائیں</div>
+            </div>
+            <div class="indicator-card nafl-indicator">
+              <span class="indicator-badge">اگلا اہم وقت / نفل نماز</span>
+              <div class="indicator-title">شہر منتخب کریں</div>
+              <div class="indicator-clock">-- : -- : --</div>
+              <div class="indicator-subtext">یومیہ تقویمِ عبادات مع لائیو کاؤنٹ ڈاؤن</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- YouTube Official Channel Subscription Section -->
       <div class="youtube-subscribe-section">
@@ -983,13 +1028,13 @@
   </footer>
 
   <!-- Scripts: Engine, Data & Master App Controller -->
-  <script src="./js/prayer-times.js?v=2.3"></script>
-  <script src="./js/prayer-guide-data.js?v=2.3"></script>
+  <script src="./js/prayer-times.js?v=2.4"></script>
+  <script src="./js/prayer-guide-data.js?v=2.4"></script>
   <script src="./js/categories-data.js"></script>
   <script src="./js/hadith-data.js"></script>
   <script src="./js/quran-data.js"></script>
   <script src="./js/calendar-data.js"></script>
   <script src="./js/duas-data.js"></script>
-  <script src="./js/app.js?v=2.3"></script>
+  <script src="./js/app.js?v=2.4"></script>
 </body>
 </html>

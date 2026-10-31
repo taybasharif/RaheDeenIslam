@@ -21,7 +21,7 @@
 // Application State
 const appState = {
   currentRoute: 'home',
-  selectedCity: (typeof localStorage !== 'undefined' ? localStorage.getItem('rahedeen_city') : null) || null,
+  selectedCity: null, // Strictly null on load - user selects their city themselves
   selectedSchool: 1, // 1 = Hanafi
   hadith: {
     page: 1,
@@ -153,34 +153,47 @@ function showPageView(viewId) {
   if (el) el.classList.add('active');
 }
 
-// 4. City Dropdown & Search System
+// 4. City Dropdown & Search System (Punjab Cities Prominently Grouped)
 function initCitySelector() {
   const quickSelect = document.getElementById('quick-city-select');
   const mainDropdown = document.getElementById('main-city-dropdown');
-  const savedCity = prayerService.currentCityKey;
-  appState.selectedCity = savedCity;
+  appState.selectedCity = null;
+  prayerService.currentCityKey = null;
 
   const populateSelect = (selectEl) => {
     if (!selectEl) return;
     selectEl.innerHTML = '';
 
-    // Default placeholder option: "شہر منتخب کریں"
+    // Default placeholder option: "شہر منتخب کریں" (Always selected on initial load)
     const placeholder = document.createElement('option');
     placeholder.value = '';
     placeholder.textContent = 'شہر منتخب کریں';
     placeholder.disabled = true;
-    if (!savedCity) {
-      placeholder.selected = true;
-    }
+    placeholder.selected = true;
     selectEl.appendChild(placeholder);
+
+    // Group 1: Punjab Cities (پنجاب کے اہم شہر)
+    const punjabGroup = document.createElement('optgroup');
+    punjabGroup.label = '--- پنجاب کے اہم شہر (Punjab Cities) ---';
+
+    // Group 2: Other Pakistani Cities (دیگر پاکستانی شہر)
+    const otherGroup = document.createElement('optgroup');
+    otherGroup.label = '--- دیگر پاکستانی شہر (Other Pakistani Cities) ---';
 
     for (const [key, city] of Object.entries(PAK_CITIES)) {
       const option = document.createElement('option');
       option.value = key;
       option.textContent = `${city.nameUrdu} (${city.nameEn}) — ${city.province}`;
-      if (key === savedCity) option.selected = true;
-      selectEl.appendChild(option);
+
+      if (city.province === 'پنجاب') {
+        punjabGroup.appendChild(option);
+      } else {
+        otherGroup.appendChild(option);
+      }
     }
+
+    selectEl.appendChild(punjabGroup);
+    selectEl.appendChild(otherGroup);
   };
 
   populateSelect(quickSelect);
@@ -190,7 +203,7 @@ function initCitySelector() {
     quickSelect.addEventListener('change', (e) => onCityDropdownChange(e.target.value));
   }
 
-  updateProminentCityDisplay(savedCity);
+  updateProminentCityDisplay(null);
 }
 
 function filterCityDropdown(query) {
@@ -209,6 +222,12 @@ function filterCityDropdown(query) {
   }
   mainDropdown.appendChild(placeholder);
 
+  const punjabGroup = document.createElement('optgroup');
+  punjabGroup.label = '--- پنجاب کے اہم شہر (Punjab Cities) ---';
+
+  const otherGroup = document.createElement('optgroup');
+  otherGroup.label = '--- دیگر پاکستانی شہر (Other Pakistani Cities) ---';
+
   for (const [key, city] of Object.entries(PAK_CITIES)) {
     const matchUrdu = city.nameUrdu.includes(cleanQuery);
     const matchEn = city.nameEn.toLowerCase().includes(cleanQuery);
@@ -219,9 +238,17 @@ function filterCityDropdown(query) {
       option.value = key;
       option.textContent = `${city.nameUrdu} (${city.nameEn}) — ${city.province}`;
       if (key === appState.selectedCity) option.selected = true;
-      mainDropdown.appendChild(option);
+
+      if (city.province === 'پنجاب') {
+        punjabGroup.appendChild(option);
+      } else {
+        otherGroup.appendChild(option);
+      }
     }
   }
+
+  if (punjabGroup.children.length > 0) mainDropdown.appendChild(punjabGroup);
+  if (otherGroup.children.length > 0) mainDropdown.appendChild(otherGroup);
 }
 
 async function onCityDropdownChange(cityKey) {
@@ -406,17 +433,26 @@ function renderNoCitySelectedState() {
         <p class="urdu-text" style="color:var(--text-muted); font-size:1rem; max-width:650px; margin:0 auto 20px;">
           پانچوں فرض نمازوں (فجر، ظہر، عصر حنفی، مغرب، عشاء) کے درست فلکیاتی اوقات اور سیکنڈ بہ سیکنڈ لائیو کاؤنٹ ڈاؤن دیکھنے کے لیے فہرست سے اپنا شہر منتخب کریں۔
         </p>
+        <div style="font-weight:700; color:var(--emerald-950); margin-bottom:10px; font-size:1.05rem;">
+          📍 پنجاب کے اہم شہر (براہِ راست وقت تبدیل کرنے کے لیے شہر پر کلک کریں):
+        </div>
         <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
-          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('vehari')">وہاڑی (Vehari)</button>
-          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('chishtian')">چشتیاں (Chishtian)</button>
           <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('lahore')">لاہور (Lahore)</button>
-          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('karachi')">کراچی (Karachi)</button>
-          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('islamabad')">اسلام آباد (Islamabad)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('faisalabad')">فیصل آباد (Faisalabad)</button>
           <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rawalpindi')">راولپنڈی (Rawalpindi)</button>
           <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('multan')">ملتان (Multan)</button>
-          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('faisalabad')">فیصل آباد (Faisalabad)</button>
-          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('peshawar')">پشاور (Peshawar)</button>
-          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('quetta')">کوئٹہ (Quetta)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('gujranwala')">گوجرانوالہ (Gujranwala)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sialkot')">سیالکوٹ (Sialkot)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sargodha')">سرگودھا (Sargodha)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('bahawalpur')">بہاولپور (Bahawalpur)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('dera_ghazi_khan')">ڈیرہ غازی خان (D.G. Khan)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sahiwal')">ساہیوال (Sahiwal)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rahim_yar_khan')">رحیم یار خان (R.Y. Khan)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('kasur')">قصور (Kasur)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('jhang')">جھنگ (Jhang)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sheikhupura')">شیخوپورہ (Sheikhupura)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('vehari')">وہاڑی (Vehari)</button>
+          <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('chishtian')">چشتیاں (Chishtian)</button>
         </div>
       </div>
     `;
@@ -633,24 +669,31 @@ function renderDualIndicators(eventState) {
   const naflClock = document.getElementById('dual-nafl-clock');
   const naflSub = document.getElementById('dual-nafl-subtext');
 
-  if (fardName && eventState.nextFard) {
-    fardName.textContent = `${eventState.nextFard.nameUrdu} (${eventState.nextFard.time12})`;
+  if (fardName && eventState && eventState.nextFard) {
+    const fard = eventState.nextFard;
+    const fName = fard.nameUrdu || fard.name || 'اگلی نماز';
+    const fTime = fard.time12 ? ` (${fard.time12})` : '';
+    fardName.textContent = `${fName}${fTime}`;
   }
-  if (fardClock && eventState.nextFard) {
-    fardClock.textContent = eventState.nextFard.countdownFormatted;
+  if (fardClock && eventState && eventState.nextFard) {
+    fardClock.textContent = eventState.nextFard.countdownFormatted || '00 : 00 : 00';
   }
   if (fardSub) {
-    fardSub.textContent = 'نماز شروع ہونے میں باقی وقت';
+    fardSub.textContent = 'نماز شروع ہونے میں باقی وقت (12 Hour AM/PM)';
   }
 
-  if (naflName && eventState.nextEventOrNafl) {
-    naflName.textContent = `${eventState.nextEventOrNafl.nameUrdu} (${eventState.nextEventOrNafl.time12})`;
+  if (naflName && eventState && eventState.nextEventOrNafl) {
+    const nafl = eventState.nextEventOrNafl;
+    const nName = nafl.nameUrdu || nafl.name || 'اگلا اہم وقت';
+    const nTime = nafl.time12 ? ` (${nafl.time12})` : '';
+    naflName.textContent = `${nName}${nTime}`;
   }
-  if (naflClock && eventState.nextEventOrNafl) {
-    naflClock.textContent = eventState.nextEventOrNafl.countdownFormatted;
+  if (naflClock && eventState && eventState.nextEventOrNafl) {
+    naflClock.textContent = eventState.nextEventOrNafl.countdownFormatted || '00 : 00 : 00';
   }
-  if (naflSub && eventState.nextEventOrNafl) {
-    naflSub.textContent = `وقت شروع ہونے میں باقی وقت (${eventState.nextEventOrNafl.desc})`;
+  if (naflSub && eventState && eventState.nextEventOrNafl) {
+    const desc = eventState.nextEventOrNafl.desc ? ` (${eventState.nextEventOrNafl.desc})` : '';
+    naflSub.textContent = `وقت شروع ہونے میں باقی وقت${desc}`;
   }
 }
 
@@ -884,21 +927,37 @@ function renderQuickBarPills(timings, eventState) {
   `).join('');
 }
 
-// Render Home Live Widget
+// Render Home Live Widget (Zero 'undefined' guaranteed + Punjab City Switcher)
 function renderHomeLiveWidget(timings, eventState) {
   const container = document.getElementById('home-live-countdown-container');
-  if (!container || !eventState.nextFard) return;
+  if (!container) return;
+
+  if (!appState.selectedCity || !timings || !timings.city || !eventState || !eventState.nextFard) {
+    renderHomeNoCityState();
+    return;
+  }
 
   const city = timings.city;
+  const cityName = city.nameUrdu || 'پنجاب';
+  const nextFard = eventState.nextFard || {};
+  const nextFardName = nextFard.nameUrdu || 'اگلی نماز';
+  const nextFardTime = nextFard.time12 || '--:--';
+  const nextFardClock = nextFard.countdownFormatted || '00 : 00 : 00';
+
+  const nextNafl = eventState.nextEventOrNafl || {};
+  const nextNaflName = nextNafl.nameUrdu || 'نفل نماز / اہم وقت';
+  const nextNaflTime = nextNafl.time12 || '--:--';
+  const nextNaflClock = nextNafl.countdownFormatted || '00 : 00 : 00';
+  const nextNaflDesc = nextNafl.desc || 'یومیہ تقویمِ عبادات';
 
   container.innerHTML = `
-    <div class="dual-indicators-container" style="margin-bottom:28px;">
+    <div class="dual-indicators-container" style="margin-bottom:20px;">
       <!-- Next Fard Indicator -->
       <div class="indicator-card">
-        <span class="indicator-badge">📍 ${city.nameUrdu}، پاکستان — اگلی فرض نماز</span>
-        <div class="indicator-title">${eventState.nextFard.nameUrdu} (${eventState.nextFard.time12})</div>
-        <div class="indicator-clock">${eventState.nextFard.countdownFormatted}</div>
-        <div class="indicator-subtext">نماز شروع ہونے میں باقی وقت</div>
+        <span class="indicator-badge">📍 ${cityName}، پاکستان — اگلی فرض نماز</span>
+        <div class="indicator-title">${nextFardName} (${nextFardTime})</div>
+        <div class="indicator-clock">${nextFardClock}</div>
+        <div class="indicator-subtext">نماز شروع ہونے میں باقی وقت (12 Hour AM/PM)</div>
         <div style="margin-top:14px;">
           <a href="#prayer-times" class="btn btn-sm btn-gold" data-route="prayer-times">
             مکمل اوقات و کاؤنٹ ڈاؤن ٹائمر دیکھیں ←
@@ -909,13 +968,90 @@ function renderHomeLiveWidget(timings, eventState) {
       <!-- Next Recommended / Nafl Indicator -->
       <div class="indicator-card nafl-indicator">
         <span class="indicator-badge">اگلا اہم وقت / نفل نماز</span>
-        <div class="indicator-title">${eventState.nextEventOrNafl.nameUrdu} (${eventState.nextEventOrNafl.time12})</div>
-        <div class="indicator-clock">${eventState.nextEventOrNafl.countdownFormatted}</div>
-        <div class="indicator-subtext">${eventState.nextEventOrNafl.desc}</div>
+        <div class="indicator-title">${nextNaflName} (${nextNaflTime})</div>
+        <div class="indicator-clock">${nextNaflClock}</div>
+        <div class="indicator-subtext">${nextNaflDesc}</div>
         <div style="margin-top:14px;">
           <a href="#prayer-times" class="btn btn-sm btn-outline-gold" data-route="prayer-times">
             یومیہ تقویمِ عبادات دیکھیں ←
           </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Punjab Cities Switcher on Home Page -->
+    <div style="background:var(--ivory-50); border:1px solid rgba(212,175,55,0.3); border-radius:12px; padding:16px 20px; text-align:center; margin-bottom:28px;">
+      <div style="font-weight:700; color:var(--emerald-950); font-size:0.95rem; margin-bottom:8px;">
+        📍 دیگر پنجاب کے شہر کا وقت تبدیل کرنے کے لیے کلک کریں:
+      </div>
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px;">
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'lahore' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('lahore')">لاہور</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'faisalabad' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('faisalabad')">فیصل آباد</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'rawalpindi' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('rawalpindi')">راولپنڈی</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'multan' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('multan')">ملتان</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'gujranwala' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('gujranwala')">گوجرانوالہ</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'sialkot' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sialkot')">سیالکوٹ</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'sargodha' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sargodha')">سرگودھا</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'bahawalpur' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('bahawalpur')">بہاولپور</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'dera_ghazi_khan' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('dera_ghazi_khan')">ڈی جی خان</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'sahiwal' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sahiwal')">ساہیوال</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'rahim_yar_khan' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('rahim_yar_khan')">رحیم یار خان</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'kasur' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('kasur')">قصور</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'jhang' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('jhang')">جھنگ</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'sheikhupura' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('sheikhupura')">شیخوپورہ</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'vehari' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('vehari')">وہاڑی</button>
+        <button type="button" class="btn btn-sm ${appState.selectedCity === 'chishtian' ? 'btn-gold' : 'btn-outline-gold'}" onclick="onCityDropdownChange('chishtian')">چشتیاں</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderHomeNoCityState() {
+  const container = document.getElementById('home-live-countdown-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="home-city-select-prompt card card-crest" style="margin-bottom:28px; text-align:center; padding:28px 20px;">
+      <span class="section-badge" style="margin-bottom:8px;">📍 مواقیت الصلاۃ برائے پنجاب و پاکستان</span>
+      <h3 style="color:var(--emerald-950); font-size:1.6rem; margin-bottom:8px;">
+        اپنا شہر منتخب فرمائیں (پنجاب کے اہم شہر)
+      </h3>
+      <p class="urdu-text" style="color:var(--text-muted); font-size:1rem; max-width:680px; margin:0 auto 16px;">
+        پانچوں فرض نمازوں (فجر، ظہر، عصر حنفی، مغرب، عشاء) کے درست اوقات، ۱۲ وقتی جدول، تہجد کا وقت اور سیکنڈ بہ سیکنڈ لائیو کاؤنٹ ڈاؤن دیکھنے کے لیے نیچے سے اپنے شہر پر کلک کریں:
+      </p>
+
+      <!-- Clickable Punjab City Buttons -->
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:18px;">
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('lahore')">لاہور (Lahore)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('faisalabad')">فیصل آباد (Faisalabad)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rawalpindi')">راولپنڈی (Rawalpindi)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('multan')">ملتان (Multan)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('gujranwala')">گوجرانوالہ (Gujranwala)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sialkot')">سیالکوٹ (Sialkot)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sargodha')">سرگودھا (Sargodha)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('bahawalpur')">بہاولپور (Bahawalpur)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('dera_ghazi_khan')">ڈیرہ غازی خان (D.G. Khan)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sahiwal')">ساہیوال (Sahiwal)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('rahim_yar_khan')">رحیم یار خان (R.Y. Khan)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('kasur')">قصور (Kasur)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('jhang')">جھنگ (Jhang)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('sheikhupura')">شیخوپورہ (Sheikhupura)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('vehari')">وہاڑی (Vehari)</button>
+        <button type="button" class="btn btn-sm btn-outline-gold" onclick="onCityDropdownChange('chishtian')">چشتیاں (Chishtian)</button>
+      </div>
+
+      <div class="dual-indicators-container" style="margin-top:14px;">
+        <div class="indicator-card">
+          <span class="indicator-badge">📍 اگلی فرض نماز</span>
+          <div class="indicator-title">شہر منتخب کریں</div>
+          <div class="indicator-clock">-- : -- : --</div>
+          <div class="indicator-subtext">براہِ کرم اوپر سے اپنے شہر پر کلک فرمائیں</div>
+        </div>
+        <div class="indicator-card nafl-indicator">
+          <span class="indicator-badge">اگلا اہم وقت / نفل نماز</span>
+          <div class="indicator-title">شہر منتخب کریں</div>
+          <div class="indicator-clock">-- : -- : --</div>
+          <div class="indicator-subtext">یومیہ تقویمِ عبادات مع لائیو کاؤنٹ ڈاؤن</div>
         </div>
       </div>
     </div>
